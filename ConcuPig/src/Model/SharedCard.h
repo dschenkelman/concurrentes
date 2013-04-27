@@ -1,6 +1,7 @@
 #ifndef SHAREDCARD_H_
 #define SHAREDCARD_H_
 #include "../Concurrency/SharedMemory.h"
+#include "../Concurrency/Lock.h"
 #include "../Services/NamingService.h"
 #include "Card.h"
 
@@ -9,6 +10,7 @@ class SharedCard {
 private:
 	SharedMemory<Card> sharedCardMemory;
 	int sharedMemoryState;
+	std::string fileName;
 
 public:
 

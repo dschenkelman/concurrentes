@@ -2,16 +2,15 @@
 
 #include <unistd.h>
 
+#define	logFileName	"logFileTMP"
+
 using namespace std;
 
-bool Logger::instanceFlag = false;
 Logger* Logger::singletonLogger = NULL;
 
 Logger::Logger(){
 
-	getcwd(cCurrentPath, sizeof(cCurrentPath));
-	this->logFile = string(cCurrentPath)+"/logFileTMP";
-
+	this->logFile = logFileName;
 	this->file.open (this->logFile.c_str(), ios::out | ios::app);
 
 	time (&this->rawtime);
@@ -19,22 +18,17 @@ Logger::Logger(){
 }
 
 Logger :: ~Logger (){
-    this->instanceFlag = false;
     this->file.close();
 }
 
 Logger* Logger::getInstance()
 {
-    if(! instanceFlag)
-    {
-        singletonLogger = new Logger();
-        instanceFlag = true;
-        return singletonLogger;
-    }
-    else
-    {
-        return singletonLogger;
-    }
+
+	if ( singletonLogger == NULL )
+		singletonLogger = new Logger();
+
+	return singletonLogger;
+
 }
 
 void Logger::logLine(string &logLine,LoggerLevels logLevel)

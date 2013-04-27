@@ -11,14 +11,11 @@
 class Logger {
 
 	private:
+		Logger(void);
 		static Logger *singletonLogger;
-		static bool instanceFlag;
-		char cCurrentPath[FILENAME_MAX];
 		std::string logFile;
 		std::ofstream file;
 		time_t rawtime;
-
-		Logger();
 
 	public:
 		static Logger* getInstance();
