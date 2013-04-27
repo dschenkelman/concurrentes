@@ -15,12 +15,12 @@ private:
 
 public:
 
-	Lock ( std::string name );
+	Lock ( std::string& name );
 	virtual ~Lock();
 
 private:
-	int getLock ();
-	int freeLock ();
+	int acquire ();
+	int release ();
 };
 
 #endif /* LOCK_H_ */
