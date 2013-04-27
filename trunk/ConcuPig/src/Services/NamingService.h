@@ -9,6 +9,7 @@
 #define NAMINGSERVICE_H_
 
 #include <string>
+#include <sys/ipc.h>
 
 class NamingService {
 public:
