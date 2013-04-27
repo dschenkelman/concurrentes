@@ -12,6 +12,7 @@
 
 #include "../Model/Card.h"
 #include "../Concurrency/Semaphore.h"
+#include "../Model/SharedCard.h"
 
 using namespace std;
 
@@ -21,7 +22,13 @@ private:
 	int position, leftPlayerPosition, rightPlayerPosition;
 	vector<Card> hand;
 
-	Semaphore readyToSendReceiveSemaphore;
+	Semaphore readyToSendReceiveSemaphore,
+				receiverSemaphore,
+				senderSemaphore,
+				sentSemaphore,
+				receivedSemaphore;
+
+	//SharedCard cardToSendMemory, receivedCardMemory;
 
 public:
 	PlayerHead( int position, int leftPlayerPosition, int rightPlayerPosition);

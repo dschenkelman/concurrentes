@@ -13,18 +13,29 @@ PlayerHead::PlayerHead(int position, int leftPlayerPosition, int rightPlayerPosi
 	position(position),
 	leftPlayerPosition(leftPlayerPosition),
 	rightPlayerPosition(rightPlayerPosition),
-	readyToSendReceiveSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, position))
-{
-	NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, position);
-
-}
+	readyToSendReceiveSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, position)),
+	receiverSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceiverSemaphore, position)),
+	senderSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SenderSemaphore, position)),
+	receivedSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceivedSemaphore, position)),
+	sentSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SentSemaphore, position))
+{ }
 
 void PlayerHead::playRound()
 {
+	// state : preparing to play a round
 	Card cardToSend = retrieveCardToSend();
 	informCardHasBeenSelected();
 	readyToSendReceiveSemaphore.wait();
 
+	// state : playing round
+	// TODO share card here
+	senderSemaphore.signal();
+	receiverSemaphore.signal();
+	sentSemaphore.wait();
+	receivedSemaphore.wait();
+	// TODO retrieve card here
+
+	// state: checking if i win
 
 }
 
