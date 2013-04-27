@@ -11,9 +11,9 @@
 class FileInitializer {
 private:
 	int players;
-	void InitializeFifos(void);
 	void InitializeSharedMemories(void);
 	void InitializeSemaphores(void);
+	void createFile(void);
 public:
 	FileInitializer(int players);
 	void Initialize(void);
