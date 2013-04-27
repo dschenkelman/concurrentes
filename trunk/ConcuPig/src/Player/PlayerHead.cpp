@@ -37,9 +37,13 @@ void PlayerHead::playRound()
 	sentSemaphore.wait();
 	receivedSemaphore.wait();
 	Card receivedCard = receivedCardMemory.getCard();
+	this->hand.push_back(receivedCard);
 
 	// state: checking if i win
-
+	if( isWinningHand() )
+	{
+		informMyHandIsOnTheTable();
+	}
 }
 
 Card PlayerHead::retrieveCardToSend()
@@ -58,6 +62,19 @@ Card PlayerHead::retrieveCardToSend()
 void PlayerHead::informCardHasBeenSelected()
 {
 	// TODO implement
+}
+
+void PlayerHead::informMyHandIsOnTheTable()
+{
+	// TODO implement
+}
+
+bool PlayerHead::isWinningHand()
+{
+	return
+			(this->hand[0].getNumber() == this->hand[1].getNumber()) &&
+			(this->hand[1].getNumber() == this->hand[2].getNumber()) &&
+			(this->hand[2].getNumber() == this->hand[3].getNumber());
 }
 
 PlayerHead::~PlayerHead() { }

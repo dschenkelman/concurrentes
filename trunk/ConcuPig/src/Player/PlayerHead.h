@@ -37,6 +37,8 @@ public:
 private:
 	Card retrieveCardToSend();
 	void informCardHasBeenSelected();
+	void informMyHandIsOnTheTable();
+	bool isWinningHand();
 };
 
 #endif /* PLAYERHEAD_H_ */
