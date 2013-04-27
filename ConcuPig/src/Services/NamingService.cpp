@@ -43,6 +43,6 @@ key_t NamingService::getScoreboardKey(){
 	return ftok(fileName.c_str(), 'a');
 }
 
-string getScoreboardFileName(){
+string NamingService::getScoreboardFileName(){
 	return SharedMemoryNames::Scoreboard;
 }
