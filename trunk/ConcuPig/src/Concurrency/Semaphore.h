@@ -10,14 +10,12 @@ class Semaphore {
 
 private:
 	int id;
-	int initialValue;
-
-	int initialize ();
 
 public:
-	Semaphore (key_t key, int initialValue);
+	Semaphore (key_t key);
 	virtual ~Semaphore();
 
+	int initialize (int initialValue);
 	int wait ();
 	int signal ();
 	void eliminate ();

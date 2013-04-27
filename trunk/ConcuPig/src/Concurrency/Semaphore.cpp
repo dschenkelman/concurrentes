@@ -2,19 +2,14 @@
 
 using namespace std;
 
-Semaphore :: Semaphore ( key_t key, int initialValue ) {
-
-	this->initialValue = initialValue;
-
+Semaphore :: Semaphore (key_t key) {
 	this->id = semget ( key,1,0666 | IPC_CREAT );
-
-	this->initialize ();
 }
 
 Semaphore::~Semaphore() {
 }
 
-int Semaphore :: initialize () {
+int Semaphore :: initialize (int initialValue) {
 
 	union semnum {
 		int val;
@@ -23,7 +18,7 @@ int Semaphore :: initialize () {
 	};
 
 	semnum init;
-	init.val = this->initialValue;
+	init.val = initialValue;
 	int result = semctl ( this->id,0,SETVAL,init );
 	return result;
 }
