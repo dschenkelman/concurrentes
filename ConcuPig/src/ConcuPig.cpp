@@ -7,14 +7,15 @@
 //============================================================================
 
 #include <iostream>
-#include "Services/Logger.h"
 #include <stdlib.h>
-#include "Helpers/Convert.h"
 #include "Services/ConcurrencyManager.h"
 #include <sys/fcntl.h>
 #include "Model/Scoreboard.h"
 
+#include "Services/Logger.h"
+#include "Helpers/Convert.h"
 #include "Model/SharedCard.h"
+#include "Player/PlayerHead.h"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ int main(int argc, char* argv[]) {
 	sc1 = Logger::getInstance();
 	string s1 = "Logging something";
 	sc1->logLine(s1,INFO);
+
 	cout << "Goodbye world" << endl;
 
 	Scoreboard s(4);

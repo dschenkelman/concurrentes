@@ -1,14 +1,8 @@
-/*
- * PlayerHead.h
- *
- *  Created on: 27/04/2013
- *      Author: matias
- */
-
 #ifndef PLAYERHEAD_H_
 #define PLAYERHEAD_H_
 
 #include <vector>
+#include <signal.h>
 
 #include "../Model/Card.h"
 #include "../Concurrency/Semaphore.h"
@@ -17,6 +11,7 @@
 class PlayerHead {
 
 private:
+	pid_t fatherId;
 	int number, leftPlayerNumber, rightPlayerNumber;
 	std::vector<Card> hand;
 
@@ -29,16 +24,17 @@ private:
 	SharedCard cardToSendMemory, receivedCardMemory;
 
 public:
-	PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber);
+	PlayerHead( pid_t fatherId,  int playerNumber, int leftPlayerNumber, int rightPlayerNumber);
 	virtual ~PlayerHead();
 
 	void playRound();
+	bool isWinningHand();
+	void takeCard(Card card);
 
 private:
-	Card retrieveCardToSend();
 	void informCardHasBeenSelected();
 	void informMyHandIsOnTheTable();
-	bool isWinningHand();
+	Card retrieveCardToSend();
 };
 
 #endif /* PLAYERHEAD_H_ */
