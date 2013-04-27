@@ -15,7 +15,7 @@ private:
 
 public:
 
-	Lock ( std::string& name );
+	Lock (const std::string& name );
 	virtual ~Lock();
 
 private:
