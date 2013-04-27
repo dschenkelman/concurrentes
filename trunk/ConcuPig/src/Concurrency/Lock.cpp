@@ -1,6 +1,6 @@
 #include "Lock.h"
 
-Lock :: Lock ( std::string& name ) {
+Lock :: Lock (const std::string& name ) {
 
 	this->name = name;
 
