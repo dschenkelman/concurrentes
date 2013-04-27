@@ -2,11 +2,10 @@
 
 using namespace std;
 
-Semaphore :: Semaphore ( string &name,int initialValue ) {
+Semaphore :: Semaphore ( key_t key, int initialValue ) {
 
 	this->initialValue = initialValue;
 
-	key_t key = ftok ( name.c_str(),'a' );
 	this->id = semget ( key,1,0666 | IPC_CREAT );
 
 	this->initialize ();

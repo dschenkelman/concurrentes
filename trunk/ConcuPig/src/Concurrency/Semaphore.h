@@ -15,7 +15,7 @@ private:
 	int initialize ();
 
 public:
-	Semaphore (std::string& name, int initialValue);
+	Semaphore (key_t key, int initialValue);
 	virtual ~Semaphore();
 
 	int wait ();

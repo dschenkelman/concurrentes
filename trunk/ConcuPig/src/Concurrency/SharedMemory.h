@@ -31,7 +31,7 @@ public:
 
 	SharedMemory ();
 	~SharedMemory ();
-	int create (std::string& fileName,char character );
+	int create ( key_t key );
 	void release ();
 	void setValue ( T value );
 	T getValue ();
@@ -46,27 +46,21 @@ template <class T> SharedMemory<T> :: SharedMemory () {
 template <class T> SharedMemory<T> :: ~SharedMemory () {
 }
 
-template <class T> int SharedMemory<T> :: create ( std::string& fileName,char letra ) {
-	// key generation
-	key_t key = ftok(fileName.c_str(), letra);
-	if (-1 == key)
-		return FTOK_ERROR;
+template <class T> int SharedMemory<T> :: create ( key_t key ) {
+	// create shared memory
+	this->shmId = shmget(key, sizeof(T), 0644|IPC_CREAT);
+
+	if ( this->shmId == -1 )
+		return SHMGET_ERROR;
 	else {
-		// create shared memory
-		this->shmId = shmget(key, sizeof(T), 0644|IPC_CREAT);
+		// attach memory block to process address space
+		void* temp = shmat(this->shmId, NULL, 0);
 
-		if ( this->shmId == -1 )
-			return SHMGET_ERROR;
-		else {
-			// attach memory block to process address space
-			void* temp = shmat(this->shmId, NULL, 0);
-
-			if ( temp == (void *) -1 ) {
-				return SHMAT_ERROR;
-			} else {
-				this->dataPointer = (T *) temp;
-				return SHM_OK;
-			}
+		if ( temp == (void *) -1 ) {
+			return SHMAT_ERROR;
+		} else {
+			this->dataPointer = (T *) temp;
+			return SHM_OK;
 		}
 	}
 }
