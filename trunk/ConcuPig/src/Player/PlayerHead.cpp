@@ -49,7 +49,7 @@ Card PlayerHead::retrieveCardToSend()
 	//
 
 	Card returnedCard = this->hand[position];
-	vector<Card>::iterator it = this->hand.begin();
+	std::vector<Card>::iterator it = this->hand.begin();
 	advance(it, position);
 	this->hand.erase(it);
 	return returnedCard;

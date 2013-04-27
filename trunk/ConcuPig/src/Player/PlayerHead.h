@@ -14,13 +14,11 @@
 #include "../Concurrency/Semaphore.h"
 #include "../Model/SharedCard.h"
 
-using namespace std;
-
 class PlayerHead {
 
 private:
 	int number, leftPlayerNumber, rightPlayerNumber;
-	vector<Card> hand;
+	std::vector<Card> hand;
 
 	Semaphore readyToSendReceiveSemaphore,
 				receiverSemaphore,
