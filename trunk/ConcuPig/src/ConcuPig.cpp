@@ -10,6 +10,8 @@
 #include "Services/Logger.h"
 #include <stdlib.h>
 #include "Helpers/Convert.h"
+#include "Services/ConcurrencyManager.h"
+#include <sys/fcntl.h>
 
 #include "Model/SharedCard.h"
 
@@ -26,11 +28,16 @@ int main(int argc, char* argv[]) {
 
 	cout << "Hello world " << players << endl; // prints Hello world*/
 
+	ConcurrencyManager manager(5);
+	manager.initialize();
+
 	Logger *sc1;
 	sc1 = Logger::getInstance();
 	string s1 = "Logging something";
 	sc1->logLine(s1,INFO);
 	cout << "Goodbye world" << endl;
+
+	manager.terminate();
 
 	return 0;
 }
