@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 	sc1->logLine(s1,INFO);
 
 	cout << "Goodbye world" << endl;
-
+	sc1->~Logger();
 	Scoreboard s(4);
 	s.trackLost(1);
 	s.trackLost(2);
