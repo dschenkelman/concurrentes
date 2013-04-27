@@ -31,10 +31,10 @@ public:
 
 	SharedMemory ();
 	~SharedMemory ();
-	int create ( key_t key );
-	void release ();
-	void setValue ( T value );
-	T getValue ();
+	int create(key_t key );
+	void release();
+	void setValue(T value);
+	T getValue();
 
 };
 

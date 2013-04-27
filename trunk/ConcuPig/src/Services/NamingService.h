@@ -13,12 +13,14 @@
 
 class NamingService {
 public:
-	static key_t getSemaphoreName(const std::string& kind, int playerNumber);
-	static key_t getCardPassingFifo(int originPlayer, int targetPlayer);
-	static key_t getDealingFifo(int player);
-	static key_t getHandDownFifo();
-	static key_t getSharedCard(const std::string& cardType, int playerNumber);
-	static key_t getScorboard();
+	static key_t getSemaphoreKey(const std::string& kind, int playerNumber);
+	static std::string getCardPassingFifoFileName(int originPlayer, int targetPlayer);
+	static std::string getDealingFifoName(int player);
+	static std::string getHandDownFifoName();
+	static key_t getSharedCardKey(const std::string& cardType, int playerNumber);
+	static std::string getSharedCardFileName(const std::string& cardType, int playerNumber);
+	static key_t getScoreboardKey();
+	static key_t getScoreboardFileName();
 };
 
 #endif /* NAMINGSERVICE_H_ */
