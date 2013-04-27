@@ -20,7 +20,7 @@ public:
 
 	int wait ();
 	int signal ();
-	void deleteSemaphore ();
+	void eliminate ();
 };
 
 

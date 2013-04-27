@@ -52,6 +52,6 @@ int Semaphore :: signal () {
 	return result;
 }
 
-void Semaphore :: deleteSemaphore () {
+void Semaphore :: eliminate () {
 	semctl ( this->id,0,IPC_RMID );
 }
