@@ -8,6 +8,8 @@
 #ifndef SHAREDMEMORYNAMES_H_
 #define SHAREDMEMORYNAMES_H_
 
+#include <string>
+
 class SharedMemoryNames {
 public:
 	static const std::string CardToSend;

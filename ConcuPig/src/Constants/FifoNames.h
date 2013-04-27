@@ -8,6 +8,8 @@
 #ifndef FIFONAMES_H_
 #define FIFONAMES_H_
 
+#include <string>
+
 class FifoNames {
 public:
 	FifoNames();
