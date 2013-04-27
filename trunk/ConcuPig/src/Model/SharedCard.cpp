@@ -33,3 +33,14 @@ Card SharedCard::getCard(){
 		return (this->sharedCardMemory.getValue());
 	}
 }
+
+void SharedCard::serialize(char* buffer){
+	Card sharedCard = this->getCard();
+	buffer[0] = sharedCard.getNumber();
+	buffer[1] = sharedCard.getSymbol();
+}
+
+void SharedCard::deSerialize(char* serializedCard){
+	Card c(serializedCard[0],serializedCard[1]);
+	setCard(c);
+}
