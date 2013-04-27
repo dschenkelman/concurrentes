@@ -18,8 +18,11 @@ public:
 	virtual ~SharedCard();
 
 	void setCard(Card card);
-
 	Card getCard();
+
+	void serialize(char* buffer);
+
+	void deSerialize(char* serializedCard);
 
 };
 
