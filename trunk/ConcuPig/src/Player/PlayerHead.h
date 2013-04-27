@@ -32,6 +32,7 @@ public:
 	void takeCard(Card card);
 
 private:
+	void createSubProcess();
 	void informCardHasBeenSelected();
 	void informMyHandIsOnTheTable();
 	Card retrieveCardToSend();

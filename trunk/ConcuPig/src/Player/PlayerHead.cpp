@@ -1,4 +1,6 @@
 #include "PlayerHead.h"
+#include "PlayerCardReceiver.h"
+#include "PlayerCardSender.h"
 #include "../Services/NamingService.h"
 #include "../Constants/SemaphoreNames.h"
 #include "../Constants/SharedMemoryNames.h"
@@ -17,7 +19,33 @@ PlayerHead::PlayerHead(pid_t fatherId, int playerNumber, int leftPlayerNumber, i
 	sentSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SentSemaphore, playerNumber)),
 	cardToSendMemory(SharedMemoryNames::CardToSend, playerNumber),
 	receivedCardMemory(SharedMemoryNames::CardToReceive, playerNumber)
-{ }
+{
+	createSubProcess();
+}
+
+void PlayerHead::createSubProcess()
+{
+	pid_t id = fork ();
+	if ( id == 0 )
+	{
+		//cout << "Hijo: Hola, soy el proceso hijo.  Mi process ID es " << getpid() << endl;
+		//cout << "Hijo: El process ID de mi padre es " << getppid() << endl;
+		PlayerCardReceiver receiver(this->number, this->leftPlayerNumber);
+		receiver.run();
+	} else
+	{
+		//cout << "Padre: Hola, soy el proceso padre.  Mi process ID es " << getpid() << endl;
+		//cout << "Padre: El process ID de mi hijo es " << id << endl;
+		id = fork ();
+		if ( id == 0 )
+		{
+			//cout << "Hijo: Hola, soy el proceso hijo.  Mi process ID es " << getpid() << endl;
+			//cout << "Hijo: El process ID de mi padre es " << getppid() << endl;
+			PlayerCardSender sender(this->number, this->rightPlayerNumber);
+			sender.run();
+		}
+	}
+}
 
 void PlayerHead::playRound()
 {
