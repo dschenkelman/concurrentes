@@ -7,6 +7,6 @@
 
 #include "SharedMemoryNames.h"
 
-const std::string SharedMemoryNames::CardToSend = "tmp/CardToSend";
-const std::string SharedMemoryNames::CardToReceive = "tmp/CardToReceive";
-const std::string SharedMemoryNames::Scoreboard = "tmp/Scoreboard";
+const std::string SharedMemoryNames::CardToSend = "CardToSend";
+const std::string SharedMemoryNames::CardToReceive = "CardToReceive";
+const std::string SharedMemoryNames::Scoreboard = "Scoreboard";
