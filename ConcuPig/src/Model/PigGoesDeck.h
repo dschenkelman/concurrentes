@@ -4,8 +4,6 @@
 #include <list>
 #include "Card.h"
 
-using namespace std;
-
 class PigGoesDeck {
 
 private:

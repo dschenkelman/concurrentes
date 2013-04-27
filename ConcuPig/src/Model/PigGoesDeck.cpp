@@ -20,7 +20,7 @@ void PigGoesDeck::shuffle()
 			int insertIndex = rand() % (this->cards.size() + 1);
 			char symbol = participantsIndex;
 			char number = cardNumber;
-			list<Card>::iterator it = this->cards.begin();
+			std::list<Card>::iterator it = this->cards.begin();
 			advance(it, insertIndex);
 			this->cards.insert(it, Card(number, symbol));
 		}
