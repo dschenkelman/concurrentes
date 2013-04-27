@@ -12,6 +12,7 @@
 #include "Helpers/Convert.h"
 #include "Services/ConcurrencyManager.h"
 #include <sys/fcntl.h>
+#include "Model/Scoreboard.h"
 
 #include "Model/SharedCard.h"
 
@@ -36,6 +37,15 @@ int main(int argc, char* argv[]) {
 	string s1 = "Logging something";
 	sc1->logLine(s1,INFO);
 	cout << "Goodbye world" << endl;
+
+	Scoreboard s(4);
+	s.trackLost(1);
+	s.trackLost(2);
+	s.trackLost(3);
+	s.trackLost(0);
+	s.trackLost(0);
+	s.trackLost(0);
+	s.print();
 
 	manager.terminate();
 
