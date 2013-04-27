@@ -2,7 +2,7 @@
 
 using namespace std;
 
-SharedCard::SharedCard (string& cardType, int playerNumber){
+SharedCard::SharedCard (const string& cardType, int playerNumber){
 
 	key_t cardKey = NamingService::getSharedCardKey(cardType,playerNumber);
 

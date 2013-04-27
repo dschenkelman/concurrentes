@@ -14,7 +14,7 @@ private:
 
 public:
 
-	SharedCard (std::string& cardType, int playerNumber);
+	SharedCard (const std::string& cardType, int playerNumber);
 	virtual ~SharedCard();
 
 	void setCard(Card card);

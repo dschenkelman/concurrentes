@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include "Helpers/Convert.h"
 
+#include "Model/SharedCard.h"
+
 using namespace std;
 
 int main(int argc, char* argv[]) {

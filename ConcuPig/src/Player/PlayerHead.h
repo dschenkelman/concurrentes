@@ -19,19 +19,19 @@ using namespace std;
 class PlayerHead {
 
 private:
-	int position, leftPlayerPosition, rightPlayerPosition;
+	int number, leftPlayerNumber, rightPlayerNumber;
 	vector<Card> hand;
 
 	Semaphore readyToSendReceiveSemaphore,
 				receiverSemaphore,
 				senderSemaphore,
-				sentSemaphore,
-				receivedSemaphore;
+				receivedSemaphore,
+				sentSemaphore;
 
-	//SharedCard cardToSendMemory, receivedCardMemory;
+	SharedCard cardToSendMemory, receivedCardMemory;
 
 public:
-	PlayerHead( int position, int leftPlayerPosition, int rightPlayerPosition);
+	PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber);
 	virtual ~PlayerHead();
 
 	void playRound();

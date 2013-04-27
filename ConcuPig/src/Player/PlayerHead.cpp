@@ -8,16 +8,19 @@
 #include "PlayerHead.h"
 #include "../Services/NamingService.h"
 #include "../Constants/SemaphoreNames.h"
+#include "../Constants/SharedMemoryNames.h"
 
-PlayerHead::PlayerHead(int position, int leftPlayerPosition, int rightPlayerPosition) :
-	position(position),
-	leftPlayerPosition(leftPlayerPosition),
-	rightPlayerPosition(rightPlayerPosition),
-	readyToSendReceiveSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, position)),
-	receiverSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceiverSemaphore, position)),
-	senderSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SenderSemaphore, position)),
-	receivedSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceivedSemaphore, position)),
-	sentSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SentSemaphore, position))
+PlayerHead::PlayerHead(int playerNumber, int leftPlayerNumber, int rightPlayerNumber) :
+	number(playerNumber),
+	leftPlayerNumber(leftPlayerNumber),
+	rightPlayerNumber(rightPlayerNumber),
+	readyToSendReceiveSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, playerNumber)),
+	receiverSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceiverSemaphore, playerNumber)),
+	senderSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SenderSemaphore, playerNumber)),
+	receivedSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceivedSemaphore, playerNumber)),
+	sentSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SentSemaphore, playerNumber)),
+	cardToSendMemory(SharedMemoryNames::CardToSend, playerNumber),
+	receivedCardMemory(SharedMemoryNames::CardToReceive, playerNumber)
 { }
 
 void PlayerHead::playRound()
@@ -28,12 +31,12 @@ void PlayerHead::playRound()
 	readyToSendReceiveSemaphore.wait();
 
 	// state : playing round
-	// TODO share card here
+	cardToSendMemory.setCard(cardToSend);
 	senderSemaphore.signal();
 	receiverSemaphore.signal();
 	sentSemaphore.wait();
 	receivedSemaphore.wait();
-	// TODO retrieve card here
+	Card receivedCard = receivedCardMemory.getCard();
 
 	// state: checking if i win
 
