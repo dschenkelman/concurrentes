@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 //	}
 
 	// int players = Convert::ToInt(argv[1]);
-	int players = 5;
+	int players = 4;
 
 	string line = "Start logging";
 	Logger::getInstance()->logLine(line, INFO);

@@ -44,8 +44,8 @@ void Table::run(){
 			Logger::getInstance()-> logLine(message, INFO);
 
 			char id[4];
-			this->handDownFifo.readValue((char*)id, sizeof(char) * 4);
-			playerId = id[0] + id[1] << 8 + id[2] << 16 + id[3] << 24;
+			this->handDownFifo.readValue(id, sizeof(char) * 4);
+			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
 
 			message = "Player put hand down: " + Convert::ToString(playerId);
 			Logger::getInstance()-> logLine(message, INFO);
@@ -92,6 +92,8 @@ void Table::unblockPlayers(void){
 void Table::notifyRoundOver(int winner){
 	for (int i = 0; i < this->playerProcesses.size(); ++i) {
 		if (i != winner){
+			string message = "Notifying player - " + Convert::ToString(i);
+			Logger::getInstance()-> logLine(message, INFO);
 			kill(this->playerProcesses[i], SignalNumbers::PlayerWon);
 		}
 	}
