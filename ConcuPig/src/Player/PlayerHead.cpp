@@ -38,8 +38,8 @@ void PlayerHead::createSubProcess()
 		//cout << "Hijo: Hola, soy el proceso hijo.  Mi process ID es " << getpid() << endl;
 		//cout << "Hijo: El process ID de mi padre es " << getppid() << endl;
 		PlayerCardReceiver receiver(this->number, this->leftPlayerNumber);
-		std::string message = "Receiver for " + Convert::ToString(this->number) + " created";
-		Logger::getInstance()->logLine( message, INFO);
+		std::string message = "Receiver created";
+		Logger::getInstance()->logPlayer(this->number, message, INFO);
 		receiver.run();
 	} else
 	{
@@ -51,18 +51,13 @@ void PlayerHead::createSubProcess()
 			//cout << "Hijo: Hola, soy el proceso hijo.  Mi process ID es " << getpid() << endl;
 			//cout << "Hijo: El process ID de mi padre es " << getppid() << endl;
 			PlayerCardSender sender(this->number, this->rightPlayerNumber);
-			std::string message = "Sender for " + Convert::ToString(this->number) + " created";
-			Logger::getInstance()->logLine( message, INFO);
+			std::string message = "Sender created";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			sender.run();
 		}
 	}
-	std::string message = "Head for " + Convert::ToString(this->number) + " created";
-	Logger::getInstance()->logLine( message, INFO);
-}
-
-void PlayerHead::playRound()
-{
-
+	std::string message = "Head created";
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
 }
 
 void PlayerHead::takeCard( Card card )
@@ -113,11 +108,15 @@ Card PlayerHead::retrieveCardToSend()
 
 void PlayerHead::informCardHasBeenSelected()
 {
+	std::string message = "playerReadyFifo.writeValue";
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
 	this->playerReadyFifo.writeValue((char*)&this->number, 1);
 }
 
 void PlayerHead::informMyHandIsOnTheTable()
 {
+	std::string message = "handDownFifo.writeValue";
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
 	this->handDownFifo.writeValue((char*)&this->number, 1);
 }
 
@@ -133,11 +132,15 @@ void PlayerHead::run()
 {
 	while( true )
 	{
+		std::string message = "dealtSemaphore.wait";
+		Logger::getInstance()->logPlayer(this->number, message, INFO);
 		dealtSemaphore.wait();
 
 		for( int i = 0 ; i < 4 ; i++)
 		{
 			char serializedCard[2];
+			message = "dealtFifo.readValue";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			dealtFifo.readValue(serializedCard, 2);
 			this->hand.push_back(Card(serializedCard[0], serializedCard[1]));
 		}
@@ -157,23 +160,23 @@ void PlayerHead::run()
 			// state : preparing to play a round
 			Card cardToSend = retrieveCardToSend();
 			informCardHasBeenSelected();
-			std::string message = "Signal for " + Convert::ToString(this->number) + " cart selected sended and wait for readyToSendSemaphore";
-			Logger::getInstance()->logLine( message, INFO);
+			message = "readyToSendReceiveSemaphore.wait";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			readyToSendReceiveSemaphore.wait();
 
 			// state : playing round
 			cardToSendMemory.setCard(cardToSend);
 			senderSemaphore.signal();
-			message = "Signal to senderSemaphore for " + Convert::ToString(this->number);
-			Logger::getInstance()->logLine( message, INFO);
+			message = "senderSemaphore.signal";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			receiverSemaphore.signal();
-			message = "Signal to receiverSemaphore for " + Convert::ToString(this->number);
-			Logger::getInstance()->logLine( message, INFO);
-			message = "Wait to sentSemaphore for " + Convert::ToString(this->number);
-			Logger::getInstance()->logLine( message, INFO);
+			message = "receiverSemaphore.signal";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
+			message = "sentSemaphore.wait";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			sentSemaphore.wait();
-			message = "Wait to receivedSemaphore for " + Convert::ToString(this->number);
-			Logger::getInstance()->logLine( message, INFO);
+			message = "receivedSemaphore.wait";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			receivedSemaphore.wait();
 			Card receivedCard = receivedCardMemory.getCard();
 			this->hand.push_back(receivedCard);
@@ -182,8 +185,8 @@ void PlayerHead::run()
 			if( isWinningHand() )
 			{
 				informMyHandIsOnTheTable();
-				message = "Signal for " + Convert::ToString(this->number) + " my hand is down, I won";
-				Logger::getInstance()->logLine( message, INFO);
+				message = "informMyHandIsOnTheTable";
+				Logger::getInstance()->logPlayer(this->number, message, INFO);
 				playingRound = false;
 			}
 		}
