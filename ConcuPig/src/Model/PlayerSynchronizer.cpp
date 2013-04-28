@@ -34,4 +34,3 @@ void PlayerSynchronizer::unblockPlayers(void){
 		this->playersReadySemaphores[i].signal();
 	}
 }
-
