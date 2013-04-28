@@ -18,7 +18,6 @@ PlayerCardSender::PlayerCardSender(int playerNumber, int playerTarget):
 }
 
 PlayerCardSender::~PlayerCardSender(){
-
 }
 
 void PlayerCardSender::run(){
