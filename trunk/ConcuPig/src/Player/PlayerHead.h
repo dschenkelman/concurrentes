@@ -2,11 +2,11 @@
 #define PLAYERHEAD_H_
 
 #include <vector>
-#include <signal.h>
 
 #include "../Model/Card.h"
 #include "../Concurrency/Semaphore.h"
 #include "../Model/SharedCard.h"
+#include <sys/types.h>
 
 class PlayerHead {
 

@@ -12,6 +12,7 @@
 #include "../Concurrency/Semaphore.h"
 #include <vector>
 #include "../Model/SharedScoreboard.h"
+#include <sys/types.h>
 
 class Table {
 private:
@@ -19,13 +20,14 @@ private:
 	int numberOfPlayers;
 	std::vector<Fifo> dealingFifos;
 	std::vector<Semaphore> dealtSemaphores;
+	std::vector<pid_t> playerProcesses;
 	SharedScoreboard scoreboard;
 
 	void deal(void);
-	void notifyRoundOver(void);
+	void notifyRoundOver(int winner);
 	void unblockPlayers(void);
 public:
-	Table(int numberOfPlayers);
+	Table(int numberOfPlayers, std::vector<int>& playerProcesses);
 	void run(void);
 	virtual ~Table();
 };

@@ -8,11 +8,9 @@
 #ifndef SIGNALNUMBERS_H_
 #define SIGNALNUMBERS_H_
 
-class SignalNumber {
+class SignalNumbers {
 public:
-	static const int PlayerWon = 60;
-	static const int CardSelected = 80;
+	static const int PlayerWon;
 };
-
 
 #endif /* SIGNALNUMBERS_H_ */
