@@ -10,9 +10,15 @@
 #include "../Helpers/Convert.h"
 #include <map>
 #include <string>
+#include "../Concurrency/Lock.h"
+#include "../Concurrency/SignalHandler.h"
+
+using namespace std;
+
 
 PlayerHead::PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber) :
-	number(playerNumber),
+playingRound(false),
+number(playerNumber),
 	leftPlayerNumber(leftPlayerNumber),
 	rightPlayerNumber(rightPlayerNumber),
 	readyToSendReceiveSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, playerNumber)),
@@ -27,6 +33,7 @@ PlayerHead::PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerN
 	handDownFifo(NamingService::getHandDownFifoName()),
 	dealtFifo(NamingService::getDealingFifoName(playerNumber))
 {
+	SignalHandler::getInstance()->registerHandler(SignalNumbers::PlayerWon, this);
 	createSubProcess();
 }
 
@@ -122,14 +129,14 @@ void PlayerHead::informCardHasBeenSelected()
 
 void PlayerHead::informMyHandIsOnTheTable()
 {
-	std::string message = "handDownFifo.writeValue";
-	Logger::getInstance()->logPlayer(this->number, message, INFO);
-
 	char n[4];
 	n[0] = this->number & 256;
 	n[1] = this->number & (256 << 8);
 	n[2] = this->number & (256 << 16);
 	n[3] = this->number & (256 << 24);
+
+	std::string message = "handDownFifo.writeValue";
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
 
 	this->handDownFifo.writeValue(n, sizeof(char) * 4);
 }
@@ -165,7 +172,7 @@ void PlayerHead::run()
 
 		dealtSemaphore.wait();
 
-		bool playingRound = true;
+		this->playingRound = true;
 /*
 		if( isWinningHand() )
 		{
@@ -217,14 +224,36 @@ void PlayerHead::run()
 			// state: checking if i win
 			if( isWinningHand() )
 			{
-				informMyHandIsOnTheTable();
-				message = "informMyHandIsOnTheTable";
-				Logger::getInstance()->logPlayer(this->number, message, INFO);
-				playingRound = false;
+				{
+					Lock l(NamingService::getDealingFifoName(this->number));
+					if (this->playingRound){
+						this->playingRound = false;
+						informMyHandIsOnTheTable();
+						message = "Player put down hand (winner)";
+						Logger::getInstance()->logPlayer(this->number, message, INFO);
+					}
+				}
 			}
 		}
 	}
 }
 
-PlayerHead::~PlayerHead() { }
+int PlayerHead::handleSignal (int signum){
+	if (signum != SignalNumbers::PlayerWon){
+		return -1;
+	}
 
+	{
+		Lock l(NamingService::getDealingFifoName(this->number));
+		if (this->playingRound){
+			this->playingRound = false;
+			informMyHandIsOnTheTable();
+			string message = "Player put down hand (not winner)";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
+		}
+	}
+
+	return 0;
+}
+
+PlayerHead::~PlayerHead() { }
