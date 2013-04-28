@@ -35,7 +35,6 @@ public:
 	void takeCard(Card card);
 
 private:
-	void playRound();
 	void createSubProcess();
 	void informCardHasBeenSelected();
 	void informMyHandIsOnTheTable();
