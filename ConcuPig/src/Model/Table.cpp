@@ -10,13 +10,17 @@
 #include "../Constants/SemaphoreNames.h"
 #include "../Constants/SignalNumbers.h"
 #include "../Model/PigGoesDeck.h"
+#include "../Services/Logger.h"
+#include "../Helpers/Convert.h"
 #include <signal.h>
+#include <string>
+
+using namespace std;
 
 Table::Table(int numberOfPlayers, std::vector<pid_t>& playerProcesses) :
 handDownFifo(NamingService::getHandDownFifoName()),
 numberOfPlayers(numberOfPlayers),
-playerProcesses(playerProcesses),
-playerSynchronizer(numberOfPlayers){
+playerProcesses(playerProcesses){
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Fifo f(NamingService::getDealingFifoName(i));
 		this->dealingFifos.push_back(f);
@@ -28,14 +32,19 @@ playerSynchronizer(numberOfPlayers){
 void Table::run(){
 	int playerId = -1;
 
+	string message = "Table starting";
+	Logger::getInstance()-> logLine(message, INFO);
+
 	do {
 		this->deal();
 		this->unblockPlayers();
-		this->playerSynchronizer.run();
 		int handPutDown = 0;
 		while(handPutDown != this->numberOfPlayers){
-
+			message = "Waiting for card to be ready";
+			Logger::getInstance()-> logLine(message, INFO);
 			this->handDownFifo.readValue((char*)&playerId, sizeof(int));
+			message = "Card ready " + playerId;
+			Logger::getInstance()-> logLine(message, INFO);
 			handPutDown++;
 
 			if (handPutDown == 1){
@@ -57,13 +66,21 @@ void Table::deal(){
 		Card card = deck.hit();
 		char c[2];
 		card.serialize(c);
-		this->dealingFifos[i % this->numberOfPlayers].writeValue(c, sizeof(char) * 2);
+		string m = "Dealing card " + Convert::ToString(i);
+		Logger::getInstance()-> logLine(m, INFO);
+		int result = this->dealingFifos[i % this->numberOfPlayers].writeValue(c, sizeof(char) * 2);
+		m = "Dealing FIFO result " + Convert::ToString(result);
+		Logger::getInstance()-> logLine(m, INFO);
 		i++;
 	}
+
+	Logger::getInstance()-> logLine("Finished dealing", INFO);
 }
 
 void Table::unblockPlayers(void){
 	for (unsigned int i = 0; i < this->dealtSemaphores.size(); i++) {
+		string s = "Signaling semaphore " + Convert::ToString(i);
+		Logger::getInstance()-> logLine(s, INFO);
 		this->dealtSemaphores[i].signal();
 	}
 }

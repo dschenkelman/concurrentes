@@ -23,8 +23,6 @@ private:
 	std::vector<Semaphore> dealtSemaphores;
 	std::vector<pid_t> playerProcesses;
 	SharedScoreboard scoreboard;
-	PlayerSynchronizer playerSynchronizer;
-
 
 	void deal(void);
 	void notifyRoundOver(int winner);
