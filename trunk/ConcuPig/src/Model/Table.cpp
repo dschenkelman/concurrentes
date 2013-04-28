@@ -40,10 +40,14 @@ void Table::run(){
 		this->unblockPlayers();
 		int handPutDown = 0;
 		while(handPutDown != this->numberOfPlayers){
-			message = "Waiting for card to be ready";
+			message = "Waiting for player to finish";
 			Logger::getInstance()-> logLine(message, INFO);
-			this->handDownFifo.readValue((char*)&playerId, sizeof(int));
-			message = "Card ready " + playerId;
+
+			char id[4];
+			this->handDownFifo.readValue((char*)id, sizeof(char) * 4);
+			playerId = id[0] + id[1] << 8 + id[2] << 16 + id[3] << 24;
+
+			message = "Player put hand down: " + playerId;
 			Logger::getInstance()-> logLine(message, INFO);
 			handPutDown++;
 

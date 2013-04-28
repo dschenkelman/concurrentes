@@ -71,13 +71,13 @@ Card PlayerHead::retrieveCardToSend()
 	for(unsigned int indexCard = 0 ; indexCard < this->hand.size() ; indexCard++)
 	{
 		Card card = this->hand[indexCard];
-		std::map<char, int>::iterator it = dictionary.find(card.getSymbol());
+		std::map<char, int>::iterator it = dictionary.find(card.getNumber());
 		int ocurrencies = 1;
 		if( dictionary.end() != it )
 		{
 			ocurrencies += it->second;
 		}
-		dictionary[card.getSymbol()] = ocurrencies;
+		dictionary[card.getNumber()] = ocurrencies;
 	}
 	std::map<char, int>::iterator minItMap = dictionary.begin();
 	std::map<char, int>::iterator itMap = dictionary.begin();
@@ -93,7 +93,7 @@ Card PlayerHead::retrieveCardToSend()
 	int position = 0;
 	while( notFountSymbol )
 	{
-		if( this->hand[position].getSymbol() == minItMap->first )
+		if( this->hand[position].getNumber() == minItMap->first )
 			notFountSymbol = false;
 		else
 			position++;
@@ -110,14 +110,28 @@ void PlayerHead::informCardHasBeenSelected()
 {
 	std::string message = "playerReadyFifo.writeValue";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
-	this->playerReadyFifo.writeValue((char*)this->number, sizeof(int));
+
+	char n[4];
+	n[0] = this->number & 256;
+	n[1] = this->number & (256 << 8);
+	n[2] = this->number & (256 << 16);
+	n[3] = this->number & (256 << 24);
+
+	this->playerReadyFifo.writeValue(n, sizeof(char) * 4);
 }
 
 void PlayerHead::informMyHandIsOnTheTable()
 {
 	std::string message = "handDownFifo.writeValue";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
-	this->handDownFifo.writeValue((char*)this->number, sizeof(int));
+
+	char n[4];
+	n[0] = this->number & 256;
+	n[1] = this->number & (256 << 8);
+	n[2] = this->number & (256 << 16);
+	n[3] = this->number & (256 << 24);
+
+	this->handDownFifo.writeValue(n, sizeof(char) * 4);
 }
 
 bool PlayerHead::isWinningHand()
@@ -132,17 +146,22 @@ void PlayerHead::run()
 {
 	while( true )
 	{
-		std::string message = "dealtSemaphore.wait";
-		Logger::getInstance()->logPlayer(this->number, message, INFO);
-
+		std::string message;
 		for( int i = 0 ; i < 4 ; i++)
 		{
 			char serializedCard[2];
 			message = "dealtFifo.readValue";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			dealtFifo.readValue(serializedCard, 2);
-			this->hand.push_back(Card(serializedCard[0], serializedCard[1]));
+
+			Card card(serializedCard[0], serializedCard[1]);
+			this->hand.push_back(card);
+
+			Logger::getInstance()->logPlayer(this->number, card.toString(), INFO);
 		}
+
+		message = "dealtSemaphore.wait";
+		Logger::getInstance()->logPlayer(this->number, message, INFO);
 
 		dealtSemaphore.wait();
 

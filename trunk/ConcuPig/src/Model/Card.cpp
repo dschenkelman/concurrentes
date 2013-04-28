@@ -1,5 +1,9 @@
 #include "Card.h"
 
+#include "../Helpers/Convert.h"
+
+using namespace std;
+
 Card::Card( char number, char symbol) : number(number), symbol(symbol) { }
 
 Card::Card( char* buffer) : number(buffer[0]), symbol(buffer[1]) { }
@@ -17,6 +21,10 @@ void Card::serialize(char* buffer){
 char Card::getSymbol()
 {
 	return symbol;
+}
+
+string Card::toString(){
+	return "Number: " + Convert::ToString((int)this->number) + "Symbol: " + Convert::ToString((int) this->symbol);
 }
 
 Card::~Card() { }
