@@ -179,7 +179,7 @@ void PlayerHead::run()
 		{
 			message = "Playing round = " + Convert::ToString(playingRoundCount);
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
-			playingRound++;
+			playingRoundCount++;
 
 			message = "Cards = " + Convert::ToString(playingRoundCount);
 			for( int i = 0; i < 4 ; i++ )
@@ -211,6 +211,8 @@ void PlayerHead::run()
 			receivedSemaphore.wait();
 			Card receivedCard = receivedCardMemory.getCard();
 			this->hand.push_back(receivedCard);
+			message = "Received card:" + receivedCard.toString();
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
 
 			// state: checking if i win
 			if( isWinningHand() )

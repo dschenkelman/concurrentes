@@ -13,9 +13,9 @@ void PigGoesDeck::shuffle()
 {
 	this->cards.clear();
 	srand( time( NULL ) );
-	for( int participantsIndex = 0 ; participantsIndex < this->participantsCount ; participantsIndex++ )
+	for( int participantsIndex = 0 ; participantsIndex < this->cardsPerSymbolCount ; participantsIndex++ )
 	{
-		for( int cardNumber = 0 ; cardNumber < this->cardsPerSymbolCount ; cardNumber++ )
+		for( int cardNumber = 0 ; cardNumber < this->participantsCount ; cardNumber++ )
 		{
 			int insertIndex = rand() % (this->cards.size() + 1);
 			char symbol = participantsIndex;
