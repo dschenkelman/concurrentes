@@ -47,7 +47,7 @@ void Table::run(){
 			this->handDownFifo.readValue((char*)id, sizeof(char) * 4);
 			playerId = id[0] + id[1] << 8 + id[2] << 16 + id[3] << 24;
 
-			message = "Player put hand down: " + playerId;
+			message = "Player put hand down: " + Convert::ToString(playerId);
 			Logger::getInstance()-> logLine(message, INFO);
 			handPutDown++;
 
