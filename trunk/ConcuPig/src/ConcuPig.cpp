@@ -12,11 +12,13 @@
 #include "Services/ConcurrencyManager.h"
 #include <sys/fcntl.h>
 #include "Model/Scoreboard.h"
-
+#include "Model/ScoreBoardController.h"
+#include "Model/Table.h"
 #include "Services/Logger.h"
 #include "Helpers/Convert.h"
 #include "Model/SharedCard.h"
 #include "Player/PlayerHead.h"
+#include <sys/wait.h>
 
 using namespace std;
 
@@ -61,11 +63,11 @@ int main(int argc, char* argv[]) {
 		sync.run();
 	}
 	else if (fork() == 0){
-		ScoreBoardController controller();
-		controller().run();
+		ScoreBoardController controller;
+		controller.run();
 	}
 
-	while (wait() > 0){
+	while (wait(NULL) > 0){
 		// improve the way this waits for all children to be done
 	}
 
