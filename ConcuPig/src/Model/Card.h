@@ -1,6 +1,8 @@
 #ifndef CARD_H_
 #define CARD_H_
 
+#include <string>
+
 class Card {
 private:
 	char number;
@@ -14,6 +16,8 @@ public:
 
 	char getNumber();
 	char getSymbol();
+
+	std::string toString();
 };
 
 #endif /* CARD_H_ */
