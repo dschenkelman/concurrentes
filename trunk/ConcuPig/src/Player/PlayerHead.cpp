@@ -110,22 +110,22 @@ void PlayerHead::informCardHasBeenSelected()
 {
 	std::string message = "playerReadyFifo.writeValue";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
-	this->playerReadyFifo.writeValue((char*)&this->number, 1);
+	this->playerReadyFifo.writeValue((char*)this->number, sizeof(int));
 }
 
 void PlayerHead::informMyHandIsOnTheTable()
 {
 	std::string message = "handDownFifo.writeValue";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
-	this->handDownFifo.writeValue((char*)&this->number, 1);
+	this->handDownFifo.writeValue((char*)this->number, sizeof(int));
 }
 
 bool PlayerHead::isWinningHand()
 {
 	return
-			(this->hand[0].getSymbol() == this->hand[1].getSymbol()) &&
-			(this->hand[1].getSymbol() == this->hand[2].getSymbol()) &&
-			(this->hand[2].getSymbol() == this->hand[3].getSymbol());
+			(this->hand[0].getNumber() == this->hand[1].getNumber()) &&
+			(this->hand[1].getNumber() == this->hand[2].getNumber()) &&
+			(this->hand[2].getNumber() == this->hand[3].getNumber());
 }
 
 void PlayerHead::run()
@@ -134,7 +134,6 @@ void PlayerHead::run()
 	{
 		std::string message = "dealtSemaphore.wait";
 		Logger::getInstance()->logPlayer(this->number, message, INFO);
-		dealtSemaphore.wait();
 
 		for( int i = 0 ; i < 4 ; i++)
 		{
@@ -144,6 +143,8 @@ void PlayerHead::run()
 			dealtFifo.readValue(serializedCard, 2);
 			this->hand.push_back(Card(serializedCard[0], serializedCard[1]));
 		}
+
+		dealtSemaphore.wait();
 
 		bool playingRound = true;
 /*

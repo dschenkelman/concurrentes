@@ -35,7 +35,7 @@ void PlayerCardSender::run(){
 		logLine = "Writing on FIFO "+this->fifoName+" from Player: "+Convert::ToString(this->playerNumber)+" to: Player: "+
 				Convert::ToString(this->playerTarget);
 		logger->logLine(logLine,INFO);
-		this->fifo.writeValue(cardToSend,2);
+		this->fifo.writeValue(cardToSend, sizeof(char) * 2);
 
 		logLine = "Signaling on Sent Semaphore";
 		logger->logPlayer(this->playerNumber,logLine,INFO);

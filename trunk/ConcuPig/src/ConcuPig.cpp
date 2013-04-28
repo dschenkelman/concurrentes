@@ -23,14 +23,17 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	if (argc != 2){
-		std::cout << "Usage is ConcuPig <numberOfPlayers>" << endl;
-		std::cin.get();
-		return 0;
-	}
+//	if (argc != 2){
+//		std::cout << "Usage is ConcuPig <numberOfPlayers>" << endl;
+//		std::cin.get();
+//		return 0;
+//	}
 
 	// int players = Convert::ToInt(argv[1]);
 	int players = 3;
+
+	string line = "Start logging";
+	Logger::getInstance()->logLine(line, INFO);
 
 	cout << "Hello world " << players << endl; // prints Hello world
 
@@ -44,7 +47,7 @@ int main(int argc, char* argv[]) {
 		pid_t childProcess = fork();
 
 		if (childProcess == 0){
-			PlayerHead player(startedPlayers, startedPlayers == 0 ? players - 1 : startedPlayers - 1, startedPlayers + 1 % players);
+			PlayerHead player(startedPlayers, startedPlayers == 0 ? players - 1 : startedPlayers - 1, (startedPlayers + 1) % players);
 			player.run();
 			break;
 		}

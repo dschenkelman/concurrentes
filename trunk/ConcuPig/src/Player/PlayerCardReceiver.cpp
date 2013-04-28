@@ -33,7 +33,7 @@ void PlayerCardReceiver::run(){
 		logLine = "Reading from FIFO "+this->fifoName+". Sent by Player: "+Convert::ToString(this->playerOrigin)+" to: Player: "+
 						Convert::ToString(this->playerNumber);
 		logger->logLine(logLine,INFO);
-		this->fifo.readValue(cardReceived,2);
+		this->fifo.readValue(cardReceived, sizeof(char) * 2);
 
 		logLine = "Deserializing and writing new card on shared memory";
 		logger->logPlayer(this->playerNumber,logLine,INFO);
