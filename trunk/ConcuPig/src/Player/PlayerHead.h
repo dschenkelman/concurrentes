@@ -6,12 +6,12 @@
 #include "../Model/Card.h"
 #include "../Concurrency/Semaphore.h"
 #include "../Model/SharedCard.h"
+#include "../Concurrency/Fifo.h"
 #include <sys/types.h>
 
 class PlayerHead {
 
 private:
-	pid_t fatherId;
 	int number, leftPlayerNumber, rightPlayerNumber;
 	std::vector<Card> hand;
 
@@ -19,19 +19,23 @@ private:
 				receiverSemaphore,
 				senderSemaphore,
 				receivedSemaphore,
-				sentSemaphore;
+				sentSemaphore,
+				dealtSemaphore;
 
 	SharedCard cardToSendMemory, receivedCardMemory;
 
+	Fifo playerReadyFifo, handDownFifo, dealtFifo;
+
 public:
-	PlayerHead( pid_t fatherId,  int playerNumber, int leftPlayerNumber, int rightPlayerNumber);
+	PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber);
 	virtual ~PlayerHead();
 
-	void playRound();
+	void run();
 	bool isWinningHand();
 	void takeCard(Card card);
 
 private:
+	void playRound();
 	void createSubProcess();
 	void informCardHasBeenSelected();
 	void informMyHandIsOnTheTable();
