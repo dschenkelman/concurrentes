@@ -10,6 +10,7 @@
 #include "../Helpers/Convert.h"
 #include <map>
 #include <string>
+#include <signal.h>
 
 PlayerHead::PlayerHead(pid_t fatherId, int playerNumber, int leftPlayerNumber, int rightPlayerNumber) :
 	fatherId(fatherId),
@@ -141,12 +142,12 @@ Card PlayerHead::retrieveCardToSend()
 
 void PlayerHead::informCardHasBeenSelected()
 {
-	kill(this->fatherId , SignalNumber::CardSelected);
+//	kill(this->fatherId , SignalNumber::CardSelected);
 }
 
 void PlayerHead::informMyHandIsOnTheTable()
 {
-	kill(this->fatherId , SignalNumber::PlayerWon);
+	kill(this->fatherId, SignalNumbers::PlayerWon);
 }
 
 bool PlayerHead::isWinningHand()

@@ -3,13 +3,13 @@
 
 class Card {
 private:
-
 	char number;
 	char symbol;
-
 public:
 
 	Card( char number, char symbol );
+	Card( char* buffer);
+	void serialize(char* buffer);
 	virtual ~Card();
 
 	char getNumber();

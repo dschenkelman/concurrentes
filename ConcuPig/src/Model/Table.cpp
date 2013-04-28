@@ -8,8 +8,14 @@
 #include "Table.h"
 #include "../Services/NamingService.h"
 #include "../Constants/SemaphoreNames.h"
+#include "../Constants/SignalNumbers.h"
+#include "../Model/PigGoesDeck.h"
+#include <signal.h>
 
-Table::Table(int numberOfPlayers) : handDownFifo(NamingService::getHandDownFifoName()), numberOfPlayers(numberOfPlayers) {
+Table::Table(int numberOfPlayers, std::vector<pid_t>& playerProcesses) :
+handDownFifo(NamingService::getHandDownFifoName()),
+numberOfPlayers(numberOfPlayers),
+playerProcesses(playerProcesses) {
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Fifo f(NamingService::getDealingFifoName(i));
 		this->dealingFifos.push_back(f);
@@ -31,7 +37,7 @@ void Table::run(){
 			handPutDown++;
 
 			if (handPutDown == 1){
-				this->notifyRoundOver();
+				this->notifyRoundOver(playerId);
 			}
 		}
 	} while(!this->scoreboard.trackLost(playerId));
@@ -40,7 +46,18 @@ void Table::run(){
 }
 
 void Table::deal(){
+	PigGoesDeck deck(this->numberOfPlayers);
+	deck.shuffle();
 
+	int i = 0;
+
+	while (deck.hasNextCard()){
+		Card card = deck.hit();
+		char c[2];
+		card.serialize(c);
+		this->dealingFifos[i % this->numberOfPlayers].writeValue(c, sizeof(char) * 2);
+		i++;
+	}
 }
 
 void Table::unblockPlayers(void){
@@ -49,11 +66,17 @@ void Table::unblockPlayers(void){
 	}
 }
 
-void Table::notifyRoundOver(void){
-
+void Table::notifyRoundOver(int winner){
+	for (int i = 0; i < this->playerProcesses.size(); ++i) {
+		if (i != winner){
+			kill(this->playerProcesses[i], SignalNumbers::PlayerWon);
+		}
+	}
 }
 
 Table::~Table() {
-	// TODO Auto-generated destructor stub
+	for (unsigned int i = 0; i < this->dealingFifos.size(); i++) {
+		this->dealingFifos[i].closeFifo();
+		this->dealingFifos[i].eliminate();
+	}
 }
-
