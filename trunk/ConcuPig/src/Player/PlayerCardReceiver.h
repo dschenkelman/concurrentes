@@ -4,6 +4,7 @@
 #include "../Concurrency/Semaphore.h"
 #include "../Concurrency/Fifo.h"
 #include "../Model/SharedCard.h"
+#include <string>
 
 class PlayerCardReceiver{
 
@@ -11,7 +12,8 @@ class PlayerCardReceiver{
 		Semaphore receiverSemaphore,receivedSemaphore;
 		SharedCard sharedCard;
 		Fifo fifo;
-		int playerNumber,playerTarget;
+		int playerNumber,playerOrigin;
+		std::string fifoName;
 
 	public:
 		PlayerCardReceiver(int playerNumber, int playerTaget);
