@@ -19,10 +19,12 @@
 #include "Model/SharedCard.h"
 #include "Player/PlayerHead.h"
 #include <sys/wait.h>
+#include <time.h>
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
+	srand( time( NULL ) );
 //	if (argc != 2){
 //		std::cout << "Usage is ConcuPig <numberOfPlayers>" << endl;
 //		std::cin.get();
@@ -30,6 +32,7 @@ int main(int argc, char* argv[]) {
 //	}
 
 	// int players = Convert::ToInt(argv[1]);
+
 	int players = 4;
 
 	string line = "Start logging";
@@ -77,7 +80,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	manager.terminate();
-
 	cout << "Game over" << endl;
 
 	return 0;

@@ -12,6 +12,7 @@
 #include <string>
 #include "../Concurrency/Lock.h"
 #include "../Concurrency/SignalHandler.h"
+#include <cstdlib>
 
 using namespace std;
 
@@ -86,29 +87,38 @@ Card PlayerHead::retrieveCardToSend()
 		}
 		dictionary[card.getNumber()] = ocurrencies;
 	}
-	std::map<char, int>::iterator minItMap = dictionary.begin();
+	int minOcurrence = 1000;
 	std::map<char, int>::iterator itMap = dictionary.begin();
 	while( dictionary.end() != itMap )
 	{
-		if( minItMap->second > itMap->second )
+		if( minOcurrence > itMap->second )
 		{
-			minItMap = itMap;
+			minOcurrence = itMap->second;
 		}
 		itMap++;
 	}
-	bool notFountSymbol = true;
-	int position = 0;
-	while( notFountSymbol )
+	std::vector<char> numbersWithMinOccurrencies;
+	itMap = dictionary.begin();
+	while( dictionary.end() != itMap )
 	{
-		if( this->hand[position].getNumber() == minItMap->first )
-			notFountSymbol = false;
-		else
-			position++;
+		if( minOcurrence == itMap->second )
+		{
+			numbersWithMinOccurrencies.push_back(itMap->first);
+		}
+		itMap++;
 	}
-
-	Card returnedCard = this->hand[position];
+	char numberSelected = numbersWithMinOccurrencies[rand() % numbersWithMinOccurrencies.size()];
+	bool notFountSymbol = true;
+	std::vector<int> positionsOfCandidateCards;
+	for( int i = 0 ; i < this->hand.size() ; i++ )
+	{
+		if( this->hand[i].getNumber() == numberSelected )
+			positionsOfCandidateCards.push_back(i);
+	}
+	int positionSelected = positionsOfCandidateCards[rand() % positionsOfCandidateCards.size()];
+	Card returnedCard = this->hand[positionSelected];
 	std::vector<Card>::iterator it = this->hand.begin();
-	advance(it, position);
+	advance(it, positionSelected);
 	this->hand.erase(it);
 	return returnedCard;
 }
@@ -117,9 +127,9 @@ void PlayerHead::informCardHasBeenSelected()
 {
 	char n[4];
 	n[0] = this->number & 255;
-	n[1] = this->number & (255 << 8);
-	n[2] = this->number & (255 << 16);
-	n[3] = this->number & (255 << 24);
+	n[1] = (this->number >> 8 ) & 255;
+	n[2] = (this->number >> 16) & 255;
+	n[3] = (this->number >> 24 ) & 255;
 
 	std::string message = "playerReadyFifo.writeValue";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
@@ -131,9 +141,9 @@ void PlayerHead::informMyHandIsOnTheTable()
 {
 	char n[4];
 	n[0] = this->number & 255;
-	n[1] = this->number & (255 << 8);
-	n[2] = this->number & (255 << 16);
-	n[3] = this->number & (255 << 24);
+	n[1] = (this->number >> 8 ) & 255;
+	n[2] = (this->number >> 16) & 255;
+	n[3] = (this->number >> 24 ) & 255;
 
 	std::string message = "handDownFifo.writeValue";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
