@@ -174,9 +174,20 @@ void PlayerHead::run()
 		}
 		*/
 
-
+		int playingRoundCount = 0;
 		while( playingRound )
 		{
+			message = "Playing round = " + Convert::ToString(playingRoundCount);
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
+			playingRound++;
+
+			message = "Cards = " + Convert::ToString(playingRoundCount);
+			for( int i = 0; i < 4 ; i++ )
+			{
+				message += this->hand[i].toString() + " | ";
+			}
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
+
 			// state : preparing to play a round
 			Card cardToSend = retrieveCardToSend();
 			informCardHasBeenSelected();
