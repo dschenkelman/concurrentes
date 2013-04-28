@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
 	string line = "Start logging";
 	Logger::getInstance()->logLine(line, INFO);
 
-	cout << "Hello world " << players << endl; // prints Hello world
+	cout << "Players " << players << endl;
 
 	ConcurrencyManager manager(players);
 	manager.initialize();
@@ -70,11 +70,15 @@ int main(int argc, char* argv[]) {
 		controller.run();
 	}
 
-	while (wait(NULL) > 0){
-		// improve the way this waits for all children to be done
+	int state = 0;
+
+	for (int i = 0; i < (3 + players); i++){
+		wait(&state);
 	}
 
 	manager.terminate();
+
+	cout << "Game over" << endl;
 
 	return 0;
 }
