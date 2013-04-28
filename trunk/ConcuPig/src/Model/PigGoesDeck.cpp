@@ -12,7 +12,6 @@ PigGoesDeck::PigGoesDeck( int participantsCount ) :
 void PigGoesDeck::shuffle()
 {
 	this->cards.clear();
-	srand( time( NULL ) );
 	for( int participantsIndex = 0 ; participantsIndex < this->cardsPerSymbolCount ; participantsIndex++ )
 	{
 		for( int cardNumber = 0 ; cardNumber < this->participantsCount ; cardNumber++ )
