@@ -12,10 +12,10 @@ class PlayerCardSender{
 
 	private:
 		Semaphore senderSemaphore,sentSemaphore;
-		SharedCard sharedCard;
 		Fifo fifo;
 		std::string fifoName;
 		int playerNumber,playerTarget;
+		SharedCard sharedCard;
 
 	public:
 		PlayerCardSender(int playerNumber, int playerTaget);
