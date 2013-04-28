@@ -32,7 +32,7 @@ void PlayerSynchronizer::run(){
 
 			char id[4];
 
-			this->playersReadyFifo.readValue((char*)id, sizeof(char) * 4);
+			this->playersReadyFifo.readValue(id, sizeof(char) * 4);
 
 			playerId = id[0] + id[1] << 8 + id[2] << 16 + id[3] << 24;
 

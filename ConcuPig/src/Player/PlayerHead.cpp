@@ -115,14 +115,14 @@ Card PlayerHead::retrieveCardToSend()
 
 void PlayerHead::informCardHasBeenSelected()
 {
+	char n[4];
+	n[0] = this->number & 255;
+	n[1] = this->number & (255 << 8);
+	n[2] = this->number & (255 << 16);
+	n[3] = this->number & (255 << 24);
+
 	std::string message = "playerReadyFifo.writeValue";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
-
-	char n[4];
-	n[0] = this->number & 256;
-	n[1] = this->number & (256 << 8);
-	n[2] = this->number & (256 << 16);
-	n[3] = this->number & (256 << 24);
 
 	this->playerReadyFifo.writeValue(n, sizeof(char) * 4);
 }
@@ -130,10 +130,10 @@ void PlayerHead::informCardHasBeenSelected()
 void PlayerHead::informMyHandIsOnTheTable()
 {
 	char n[4];
-	n[0] = this->number & 256;
-	n[1] = this->number & (256 << 8);
-	n[2] = this->number & (256 << 16);
-	n[3] = this->number & (256 << 24);
+	n[0] = this->number & 255;
+	n[1] = this->number & (255 << 8);
+	n[2] = this->number & (255 << 16);
+	n[3] = this->number & (255 << 24);
 
 	std::string message = "handDownFifo.writeValue";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
@@ -222,7 +222,7 @@ void PlayerHead::run()
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 
 			// state: checking if i win
-			if( isWinningHand() )
+			if (isWinningHand())
 			{
 				{
 					Lock l(NamingService::getDealingFifoName(this->number));
