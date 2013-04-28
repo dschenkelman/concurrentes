@@ -29,6 +29,10 @@ string NamingService::getHandDownFifoName(){
 	return FifoNames::HandDown;
 }
 
+string NamingService::getPlayersReadyFifoName(){
+	return FifoNames::PlayersReady;
+}
+
 key_t NamingService::getSharedCardKey(const std::string& cardType, int playerNumber){
 	return ftok(getSharedCardFileName(cardType, playerNumber).c_str(), 'a');
 }

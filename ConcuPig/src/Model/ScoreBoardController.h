@@ -8,6 +8,8 @@
 #ifndef SCOREBOARDCONTROLLER_H_
 #define SCOREBOARDCONTROLLER_H_
 
+#include "SharedScoreboard.h"
+
 class ScoreBoardController {
 
 private:

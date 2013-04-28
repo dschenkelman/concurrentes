@@ -13,4 +13,5 @@ using namespace std;
 const std::string FifoNames::CardPassing = "PassCard";
 const std::string FifoNames::Dealing = "Deal";
 const std::string FifoNames::HandDown = "HandDown";
+const std::string FifoNames::PlayersReady = "PlayersReady";
 

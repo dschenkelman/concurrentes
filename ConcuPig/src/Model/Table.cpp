@@ -15,7 +15,8 @@
 Table::Table(int numberOfPlayers, std::vector<pid_t>& playerProcesses) :
 handDownFifo(NamingService::getHandDownFifoName()),
 numberOfPlayers(numberOfPlayers),
-playerProcesses(playerProcesses) {
+playerProcesses(playerProcesses),
+playerSynchronizer(numberOfPlayers){
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Fifo f(NamingService::getDealingFifoName(i));
 		this->dealingFifos.push_back(f);
@@ -30,6 +31,7 @@ void Table::run(){
 	do {
 		this->deal();
 		this->unblockPlayers();
+		this->playerSynchronizer.run();
 		int handPutDown = 0;
 		while(handPutDown != this->numberOfPlayers){
 

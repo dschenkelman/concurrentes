@@ -16,6 +16,7 @@ public:
 	static const std::string CardPassing;
 	static const std::string Dealing;
 	static const std::string HandDown;
+	static const std::string PlayersReady;
 	virtual ~FifoNames();
 };
 
