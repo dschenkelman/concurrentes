@@ -7,11 +7,12 @@
 #include <fstream>
 #include "LoggerLevels.h"
 #include "../Concurrency/Lock.h"
+#include "../Helpers/Convert.h"
 
 class Logger {
 
 	private:
-		Logger(void);
+		Logger();
 		static Logger *singletonLogger;
 		std::string logFile;
 		std::ofstream file;
@@ -19,7 +20,8 @@ class Logger {
 
 	public:
 		static Logger* getInstance();
-		void logLine(std::string &logLine,LoggerLevels logLevel);
+		void logLine(const std::string &logLine,LoggerLevels logLevel);
+		void logPlayer(int playerNumber,const std::string &logLine,LoggerLevels logLevel);
 		~Logger();
 };
 

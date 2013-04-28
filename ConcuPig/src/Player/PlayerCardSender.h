@@ -4,6 +4,9 @@
 #include "../Concurrency/Semaphore.h"
 #include "../Concurrency/Fifo.h"
 #include "../Model/SharedCard.h"
+#include "../Services/Logger.h"
+#include "../Helpers/Convert.h"
+#include <string>
 
 class PlayerCardSender{
 
@@ -11,6 +14,7 @@ class PlayerCardSender{
 		Semaphore senderSemaphore,sentSemaphore;
 		SharedCard sharedCard;
 		Fifo fifo;
+		std::string fifoName;
 		int playerNumber,playerTarget;
 
 	public:

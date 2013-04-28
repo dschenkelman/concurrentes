@@ -23,22 +23,22 @@ Logger :: ~Logger (){
 
 Logger* Logger::getInstance()
 {
-
 	if ( singletonLogger == NULL )
 		singletonLogger = new Logger();
 
 	return singletonLogger;
-
 }
 
-void Logger::logLine(string &logLine,LoggerLevels logLevel)
+void Logger::logPlayer(int playerNumber,const string &logLine,LoggerLevels logLevel){
+	string newLogLine = "(Player: "+Convert::ToString(playerNumber)+") "+logLine;
+	this->logLine(newLogLine,logLevel);
+}
+
+void Logger::logLine(const string &logLine,LoggerLevels logLevel)
 {
 	time (&this->rawtime);
 
-	{
-		Lock l(this->logFile);
-		this->file << "Log Level: "<< logLevel <<" - "<< logLine.c_str() <<" - "<< ctime(&this->rawtime) << endl << flush;
-	}
-
+	Lock l(this->logFile);
+	this->file << "Log Level: "<< logLevel <<" - "<< logLine.c_str() <<" - "<< ctime(&this->rawtime) << endl << flush;
 }
 
