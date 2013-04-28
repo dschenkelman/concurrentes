@@ -10,8 +10,8 @@ class PlayerCardReceiver{
 
 	private:
 		Semaphore receiverSemaphore,receivedSemaphore;
-		SharedCard sharedCard;
 		Fifo fifo;
+		SharedCard sharedCard;
 		int playerNumber,playerOrigin;
 		std::string fifoName;
 
