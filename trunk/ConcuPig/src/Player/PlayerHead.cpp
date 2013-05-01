@@ -136,6 +136,13 @@ void PlayerHead::run()
 	while(!this->gameOver)
 	{
 		this->hand.clear();
+
+//		if (this->gameOver){
+//			message = "Exiting game";
+//			Logger::getInstance()->logPlayer(this->number, message, INFO);
+//			break;
+//		}
+
 		for( int i = 0 ; i < 4 ; i++)
 		{
 			char serializedCard[2];
@@ -153,7 +160,6 @@ void PlayerHead::run()
 
 		message = "dealtSemaphore.wait";
 		Logger::getInstance()->logPlayer(this->number, message, INFO);
-
 		dealtSemaphore.wait();
 
 		this->playingRound = true;

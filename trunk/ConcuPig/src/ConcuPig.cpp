@@ -11,7 +11,6 @@
 #include <vector>
 #include "Services/ConcurrencyManager.h"
 #include <sys/fcntl.h>
-#include "Model/Scoreboard.h"
 #include "Model/ScoreBoardController.h"
 #include "Model/Table.h"
 #include "Services/Logger.h"
@@ -107,11 +106,8 @@ int main(int argc, char* argv[]) {
 			Table table(players, syncId, playerProcesses);
 			table.run();
 
-			int state = 0;
-
-			for (int i = 0; i < (1 + players); i++){
-				wait(&state);
-			}
+			SharedScoreboard s(players, false);
+			s.print();
 
 			manager.terminate();
 			cout << "Game over" << endl;

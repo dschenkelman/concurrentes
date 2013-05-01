@@ -9,7 +9,6 @@
 #define SHAREDSCOREBOARD_H_
 
 #include "../Concurrency/SharedMemory.h"
-#include "../Model/Scoreboard.h"
 #include "../Model/Score.h"
 #include <vector>
 
