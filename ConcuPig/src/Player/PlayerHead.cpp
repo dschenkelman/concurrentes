@@ -13,6 +13,7 @@
 #include "../Concurrency/Lock.h"
 #include "../Concurrency/SignalHandler.h"
 #include <cstdlib>
+#include <algorithm>
 
 using namespace std;
 
@@ -78,9 +79,10 @@ Card PlayerHead::retrieveCardToSend()
 		}
 		itMap++;
 	}
-	char numberSelected = numbersWithMinOccurrencies[rand() % numbersWithMinOccurrencies.size()];
+	std::sort(numbersWithMinOccurrencies.begin(), numbersWithMinOccurrencies.end());
+	char numberSelected = numbersWithMinOccurrencies[(rand() % (numbersWithMinOccurrencies.size() + numbersWithMinOccurrencies.size() / 2 )) % numbersWithMinOccurrencies.size() ];
 	std::vector<int> positionsOfCandidateCards;
-	for( int i = 0 ; i < this->hand.size() ; i++ )
+	for( unsigned int i = 0 ; i < this->hand.size() ; i++ )
 	{
 		if( this->hand[i].getNumber() == numberSelected )
 			positionsOfCandidateCards.push_back(i);
