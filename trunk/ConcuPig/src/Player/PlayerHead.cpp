@@ -80,7 +80,7 @@ Card PlayerHead::retrieveCardToSend()
 		itMap++;
 	}
 	std::sort(numbersWithMinOccurrencies.begin(), numbersWithMinOccurrencies.end());
-	char numberSelected = numbersWithMinOccurrencies[(rand() % (numbersWithMinOccurrencies.size() + numbersWithMinOccurrencies.size() / 2 )) % numbersWithMinOccurrencies.size() ];
+	char numberSelected = numbersWithMinOccurrencies[rand() % numbersWithMinOccurrencies.size() ];
 	std::vector<int> positionsOfCandidateCards;
 	for( unsigned int i = 0 ; i < this->hand.size() ; i++ )
 	{
@@ -135,6 +135,7 @@ void PlayerHead::run()
 {
 	std::string message;
 
+	int playingGameRound = 0;
 	while(!this->gameOver)
 	{
 		this->hand.clear();
@@ -173,17 +174,20 @@ void PlayerHead::run()
 		}
 		*/
 
-		int playingRoundCount = 0;
+		int playingRoundHand = 0;
 		while( playingRound )
 		{
-			message = "Playing round = " + Convert::ToString(playingRoundCount);
+			message = "Playing round = " + Convert::ToString(playingRoundHand);
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
-			playingRoundCount++;
+			playingRoundHand++;
 
 			this->logHand();
 
 			// state : preparing to play a round
 			Card cardToSend = retrieveCardToSend();
+			message = "Card retrieved " + cardToSend.toString() + "     round,hand " + Convert::ToString(playingGameRound) + ","+ Convert::ToString(playingRoundHand);
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
+
 			informCardHasBeenSelected();
 			message = "readyToSendReceiveSemaphore.wait";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
@@ -222,6 +226,7 @@ void PlayerHead::run()
 				}
 			}
 		}
+		playingGameRound++;
 	}
 
 	message = "Head - Ending";

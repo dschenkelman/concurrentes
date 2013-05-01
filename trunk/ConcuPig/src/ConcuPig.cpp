@@ -25,7 +25,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	srand( time( NULL ) );
+	srand( time( NULL ) ^ getpid() << 16 );
 //	if (argc != 2){
 //		std::cout << "Usage is ConcuPig <numberOfPlayers>" << endl;
 //		std::cin.get();
@@ -77,6 +77,7 @@ int main(int argc, char* argv[]) {
 					message = "Sender process for player " + Convert::ToString(startedPlayers) + " is:" + Convert::ToString(senderId);
 					Logger::getInstance()->logLine(message, INFO);
 
+					srand( time( NULL ) ^ getpid() << 16 );
 					PlayerHead player(startedPlayers, receiverId, senderId);
 					message = "About to start running player " + Convert::ToString(startedPlayers);
 					Logger::getInstance()->logLine(message, INFO);
