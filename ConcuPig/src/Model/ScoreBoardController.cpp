@@ -10,7 +10,7 @@
 
 using namespace std;
 
-ScoreBoardController::ScoreBoardController() { }
+ScoreBoardController::ScoreBoardController(){ }
 
 ScoreBoardController::~ScoreBoardController() { }
 

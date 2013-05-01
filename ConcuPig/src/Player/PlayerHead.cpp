@@ -177,6 +177,8 @@ void PlayerHead::run()
 			Logger::getInstance()->logPlayer(this->number, card.toString(), INFO);
 		}
 
+		this->logHand();
+
 		message = "dealtSemaphore.wait";
 		Logger::getInstance()->logPlayer(this->number, message, INFO);
 
@@ -198,12 +200,7 @@ void PlayerHead::run()
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			playingRoundCount++;
 
-			message = "Cards = " + Convert::ToString(playingRoundCount);
-			for( int i = 0; i < 4 ; i++ )
-			{
-				message += this->hand[i].toString() + " | ";
-			}
-			Logger::getInstance()->logPlayer(this->number, message, INFO);
+			this->logHand();
 
 			// state : preparing to play a round
 			Card cardToSend = retrieveCardToSend();
@@ -238,14 +235,23 @@ void PlayerHead::run()
 					Lock l(NamingService::getDealingFifoName(this->number));
 					if (this->playingRound){
 						this->playingRound = false;
-						informMyHandIsOnTheTable();
 						message = "Player put down hand (winner)";
 						Logger::getInstance()->logPlayer(this->number, message, INFO);
+						informMyHandIsOnTheTable();
 					}
 				}
 			}
 		}
 	}
+}
+
+void PlayerHead::logHand(){
+	string message = "Cards = ";
+	for( int i = 0; i < 4 ; i++ )
+	{
+		message += this->hand[i].toString() + " | ";
+	}
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
 }
 
 int PlayerHead::handleSignal (int signum){
@@ -257,9 +263,9 @@ int PlayerHead::handleSignal (int signum){
 		Lock l(NamingService::getDealingFifoName(this->number));
 		if (this->playingRound){
 			this->playingRound = false;
-			informMyHandIsOnTheTable();
 			string message = "Player put down hand (not winner)";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
+			informMyHandIsOnTheTable();
 		}
 	}
 

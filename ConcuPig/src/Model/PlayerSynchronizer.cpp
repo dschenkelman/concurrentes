@@ -34,7 +34,7 @@ void PlayerSynchronizer::run(){
 
 			this->playersReadyFifo.readValue(id, sizeof(char) * 4);
 
-			playerId = id[0] + id[1] << 8 + id[2] << 16 + id[3] << 24;
+			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
 
 			line = "Sync - Player Id ready in Sync: " + Convert::ToString(playerId);
 			Logger::getInstance()->logLine(line, INFO);

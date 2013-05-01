@@ -28,6 +28,7 @@ private:
 	void informCardHasBeenSelected();
 	void informMyHandIsOnTheTable();
 	Card retrieveCardToSend();
+	void logHand();
 public:
 	PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber);
 	virtual ~PlayerHead();

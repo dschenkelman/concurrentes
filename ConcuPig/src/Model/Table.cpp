@@ -47,14 +47,17 @@ void Table::run(){
 			this->handDownFifo.readValue(id, sizeof(char) * 4);
 			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
 
-			message = "Player put hand down: " + Convert::ToString(playerId);
-			Logger::getInstance()-> logLine(message, INFO);
 			handPutDown++;
+			message = "Player put hand down: " + Convert::ToString(playerId) + ". Total: " + Convert::ToString(handPutDown);
+			Logger::getInstance()-> logLine(message, INFO);
 
 			if (handPutDown == 1){
 				this->notifyRoundOver(playerId);
 			}
 		}
+
+		message = "Table - Round Finished.  Player that lost: " + Convert::ToString(playerId);
+		Logger::getInstance()-> logLine(message, INFO);
 	} while(!this->scoreboard.trackLost(playerId));
 
 	// game is over
@@ -102,6 +105,5 @@ void Table::notifyRoundOver(int winner){
 Table::~Table() {
 	for (unsigned int i = 0; i < this->dealingFifos.size(); i++) {
 		this->dealingFifos[i].closeFifo();
-		this->dealingFifos[i].eliminate();
 	}
 }
