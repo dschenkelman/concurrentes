@@ -18,6 +18,8 @@
 #include "Helpers/Convert.h"
 #include "Model/SharedCard.h"
 #include "Player/PlayerHead.h"
+#include "Player/PlayerCardReceiver.h"
+#include "Player/PlayerCardSender.h"
 #include <sys/wait.h>
 #include <time.h>
 
@@ -46,15 +48,45 @@ int main(int argc, char* argv[]) {
 	int startedPlayers = 0;
 	vector<pid_t> playerProcesses;
 
+	string message;
+
 	while (startedPlayers != players){
 		pid_t childProcess = fork();
 
 		if (childProcess == 0){
-			PlayerHead player(startedPlayers, startedPlayers == 0 ? players - 1 : startedPlayers - 1, (startedPlayers + 1) % players);
-			player.run();
-			break;
+
+			pid_t receiverId = fork();
+
+			if (receiverId == 0){
+				PlayerCardReceiver receiver(startedPlayers, startedPlayers == 0 ? players - 1 : startedPlayers - 1);
+				receiver.run();
+				return 0;
+			}
+			else{
+				message = "Receiver process for player " + Convert::ToString(startedPlayers) + " is:" + Convert::ToString(receiverId);
+				Logger::getInstance()->logLine(message, INFO);
+
+				pid_t senderId = fork();
+				if (senderId == 0){
+					PlayerCardSender sender(startedPlayers, (startedPlayers + 1) % players);
+					sender.run();
+					return 0;
+				}
+				else{
+					message = "Sender process for player " + Convert::ToString(startedPlayers) + " is:" + Convert::ToString(senderId);
+					Logger::getInstance()->logLine(message, INFO);
+
+					PlayerHead player(startedPlayers, receiverId, senderId);
+					message = "About to start running player " + Convert::ToString(startedPlayers);
+					Logger::getInstance()->logLine(message, INFO);
+					player.run();
+					return 0;
+				}
+			}
 		}
 		else{
+			message = "Head process for player " + Convert::ToString(startedPlayers) + " is:" + Convert::ToString(childProcess);
+			Logger::getInstance()->logLine(message, INFO);
 			playerProcesses.push_back(childProcess);
 			startedPlayers++;
 		}

@@ -17,7 +17,7 @@ private:
 	bool gameOver;
 	pid_t receiverProcessId;
 	pid_t senderProcessId;
-	int number, leftPlayerNumber, rightPlayerNumber;
+	int number;
 	std::vector<Card> hand;
 	Semaphore readyToSendReceiveSemaphore,
 				receiverSemaphore,
@@ -33,7 +33,7 @@ private:
 	Card retrieveCardToSend();
 	void logHand();
 public:
-	PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber);
+	PlayerHead( int playerNumber, pid_t receiverProcess, pid_t senderProcess);
 	virtual ~PlayerHead();
 	void run();
 	bool isWinningHand();

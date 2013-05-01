@@ -17,14 +17,12 @@
 using namespace std;
 
 
-PlayerHead::PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber) :
+PlayerHead::PlayerHead( int playerNumber, pid_t receiverProcess, pid_t senderProcess) :
 playingRound(false),
 gameOver(false),
-receiverProcessId(0),
-senderProcessId(0),
+receiverProcessId(receiverProcess),
+senderProcessId(senderProcess),
 number(playerNumber),
-	leftPlayerNumber(leftPlayerNumber),
-	rightPlayerNumber(rightPlayerNumber),
 	readyToSendReceiveSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, playerNumber)),
 	receiverSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceiverSemaphore, playerNumber)),
 	senderSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SenderSemaphore, playerNumber)),
@@ -39,40 +37,6 @@ number(playerNumber),
 {
 	SignalHandler::getInstance()->registerHandler(SignalNumbers::PlayerWon, this);
 	SignalHandler::getInstance()->registerHandler(SignalNumbers::GameOver, this);
-	createSubProcess();
-}
-
-void PlayerHead::createSubProcess()
-{
-	pid_t id = fork ();
-	if ( id == 0 )
-	{
-		//cout << "Hijo: Hola, soy el proceso hijo.  Mi process ID es " << getpid() << endl;
-		//cout << "Hijo: El process ID de mi padre es " << getppid() << endl;
-		PlayerCardReceiver receiver(this->number, this->leftPlayerNumber);
-		std::string message = "Receiver created";
-		Logger::getInstance()->logPlayer(this->number, message, INFO);
-		receiver.run();
-	} else {
-		this->receiverProcessId = id;
-		//cout << "Padre: Hola, soy el proceso padre.  Mi process ID es " << getpid() << endl;
-		//cout << "Padre: El process ID de mi hijo es " << id << endl;
-		id = fork ();
-		if ( id == 0 )
-		{
-			//cout << "Hijo: Hola, soy el proceso hijo.  Mi process ID es " << getpid() << endl;
-			//cout << "Hijo: El process ID de mi padre es " << getppid() << endl;
-			PlayerCardSender sender(this->number, this->rightPlayerNumber);
-			std::string message = "Sender created";
-			Logger::getInstance()->logPlayer(this->number, message, INFO);
-			sender.run();
-		}
-		else{
-			this->senderProcessId = id;
-		}
-	}
-	std::string message = "Head created";
-	Logger::getInstance()->logPlayer(this->number, message, INFO);
 }
 
 void PlayerHead::takeCard( Card card )
