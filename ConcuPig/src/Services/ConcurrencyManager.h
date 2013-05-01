@@ -20,7 +20,6 @@ private:
 	int players;
 	std::vector<Semaphore> semaphores;
 	std::vector<Fifo> fifos;
-	SharedScoreboard* scoreboard;
 	void initializeSharedMemories(void);
 	void initializeSemaphores(void);
 	void initializeFifos(void);

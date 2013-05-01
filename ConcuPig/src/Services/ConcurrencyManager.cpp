@@ -18,7 +18,6 @@
 using namespace std;
 
 ConcurrencyManager::ConcurrencyManager(int players) : players(players) {
-	this->scoreboard = NULL;
 }
 
 void ConcurrencyManager::initialize(){
@@ -41,12 +40,6 @@ void ConcurrencyManager::initializeSharedMemories(){
 	string message = "Before creating scoreboard";
 
 	Logger::getInstance()->logLine(message, INFO);
-
-//	this->scoreboard = new SharedScoreboard(this->players);
-//
-//	message = "After creating scoreboard";
-//
-//	Logger::getInstance()->logLine(message, INFO);
 }
 
 void ConcurrencyManager::initializeSemaphores(){
