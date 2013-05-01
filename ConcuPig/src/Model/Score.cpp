@@ -1,11 +1,13 @@
 #include "Score.h"
+#include "../Helpers/Convert.h"
 #include "../Services/NamingService.h"
 #include "../Concurrency/Lock.h"
+#include "../Services/Logger.h"
+#include <string>
 
 using namespace std;
 
-Score::Score (int playerNumber){
-
+Score::Score (int playerNumber, bool initializeValue){
 	key_t scoreKey = NamingService::getSharedScoreKey(playerNumber);
 
 	this->fileName = NamingService::getSharedScoreFileName(playerNumber);
@@ -15,7 +17,9 @@ Score::Score (int playerNumber){
 		this->sharedScore.create(scoreKey);
 	}
 
-	this->setScore(0);
+	if (initializeValue){
+		this->setScore(0);
+	}
 }
 
 Score::~Score(){
@@ -26,7 +30,7 @@ Score::~Score(){
 
 void Score::setScore(int score){
 	Lock l(this->fileName);
-
+	string message = "Setting score " + Convert::ToString(score) + " for player " + Convert::ToString(score);
 	this->sharedScore.setValue(score);
 }
 
@@ -37,12 +41,10 @@ int Score::getScore(){
 }
 
 bool Score::trackLost(){
-
 	int score = this->getScore();
 	score += 1;
 
 	this->setScore(score);
 
 	return (score == 7);
-
 }

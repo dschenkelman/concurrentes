@@ -115,7 +115,6 @@ Card PlayerHead::retrieveCardToSend()
 		itMap++;
 	}
 	char numberSelected = numbersWithMinOccurrencies[rand() % numbersWithMinOccurrencies.size()];
-	bool notFountSymbol = true;
 	std::vector<int> positionsOfCandidateCards;
 	for( int i = 0 ; i < this->hand.size() ; i++ )
 	{
@@ -283,4 +282,5 @@ int PlayerHead::handleSignal (int signum){
 	return 0;
 }
 
-PlayerHead::~PlayerHead() { }
+PlayerHead::~PlayerHead() {
+}

@@ -12,7 +12,7 @@ private:
 
 public:
 
-	Score (int playerNumber);
+	Score (int playerNumber, bool initialieValue);
 	virtual ~Score();
 
 	void setScore(int score);
