@@ -60,27 +60,32 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	if (fork() == 0){
-		Table table(players, playerProcesses);
-		table.run();
-	}
-	else if (fork() == 0){
+	pid_t syncId = fork();
+
+	if (syncId == 0){
 		PlayerSynchronizer sync(players);
 		sync.run();
 	}
-	else if (fork() == 0){
-		ScoreBoardController controller;
-		controller.run();
+	else {
+		pid_t scoreboardId = fork();
+		if (scoreboardId == 0){
+			ScoreBoardController controller;
+			controller.run();
+		}
+		else {
+			Table table(players, syncId, scoreboardId, playerProcesses);
+			table.run();
+
+			int state = 0;
+
+			for (int i = 0; i < (2 + players); i++){
+				wait(&state);
+			}
+
+			manager.terminate();
+			cout << "Game over" << endl;
+		}
 	}
-
-	int state = 0;
-
-	for (int i = 0; i < (3 + players); i++){
-		wait(&state);
-	}
-
-	manager.terminate();
-	cout << "Game over" << endl;
 
 	return 0;
 }

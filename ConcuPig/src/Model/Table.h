@@ -22,13 +22,16 @@ private:
 	std::vector<Fifo> dealingFifos;
 	std::vector<Semaphore> dealtSemaphores;
 	std::vector<pid_t> playerProcesses;
+	pid_t scoreboardProcessId;
+	pid_t syncProcessId;
 	SharedScoreboard scoreboard;
 
 	void deal(void);
 	void notifyRoundOver(int winner);
+	void notifyGameOver();
 	void unblockPlayers(void);
 public:
-	Table(int numberOfPlayers, std::vector<int>& playerProcesses);
+	Table(int numberOfPlayers, int scoreboardProcess, int syncProcess, std::vector<int>& playerProcesses);
 	void run(void);
 	virtual ~Table();
 };

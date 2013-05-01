@@ -20,6 +20,8 @@ using namespace std;
 PlayerHead::PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber) :
 playingRound(false),
 gameOver(false),
+receiverProcessId(0),
+senderProcessId(0),
 number(playerNumber),
 	leftPlayerNumber(leftPlayerNumber),
 	rightPlayerNumber(rightPlayerNumber),
@@ -51,8 +53,8 @@ void PlayerHead::createSubProcess()
 		std::string message = "Receiver created";
 		Logger::getInstance()->logPlayer(this->number, message, INFO);
 		receiver.run();
-	} else
-	{
+	} else {
+		this->receiverProcessId = id;
 		//cout << "Padre: Hola, soy el proceso padre.  Mi process ID es " << getpid() << endl;
 		//cout << "Padre: El process ID de mi hijo es " << id << endl;
 		id = fork ();
@@ -64,6 +66,9 @@ void PlayerHead::createSubProcess()
 			std::string message = "Sender created";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			sender.run();
+		}
+		else{
+			this->senderProcessId = id;
 		}
 	}
 	std::string message = "Head created";
@@ -267,6 +272,8 @@ int PlayerHead::handleSignal (int signum){
 		}
 	}
 	else if (signum == SignalNumbers::GameOver){
+		kill(this->receiverProcessId, SignalNumbers::GameOver);
+		kill(this->senderProcessId, SignalNumbers::GameOver);
 		this->gameOver = true;
 	}
 	else {
