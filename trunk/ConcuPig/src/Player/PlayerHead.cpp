@@ -133,6 +133,7 @@ void PlayerHead::run()
 {
 	while(!this->gameOver)
 	{
+		this->hand.clear();
 		std::string message;
 		for( int i = 0 ; i < 4 ; i++)
 		{
@@ -225,7 +226,7 @@ void PlayerHead::logHand(){
 }
 
 int PlayerHead::handleSignal (int signum){
-	if (signum != SignalNumbers::PlayerWon){
+	if (signum == SignalNumbers::PlayerWon){
 		Lock l(NamingService::getDealingFifoName(this->number));
 		if (this->playingRound){
 			this->playingRound = false;
