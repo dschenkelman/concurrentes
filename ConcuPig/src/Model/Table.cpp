@@ -65,7 +65,6 @@ void Table::run(){
 	Logger::getInstance()-> logLine(message, INFO);
 
 	this->notifyGameOver();
-	// game is over
 }
 
 void Table::deal(){

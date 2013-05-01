@@ -18,7 +18,6 @@ SharedScoreboard::SharedScoreboard(int players, bool initializeValues){
 	for (int i = 0; i < players; i++) {
 		Score* s = new Score(i, initializeValues);
 		int score = s->getScore();
-		cout << "Player " << Convert::ToString(i) << " score: " << Convert::ToString(score) << endl;
 		this->playerScores.push_back(s);
 	}
 }
