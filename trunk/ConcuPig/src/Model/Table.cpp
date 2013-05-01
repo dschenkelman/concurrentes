@@ -36,7 +36,6 @@ void Table::run(){
 
 	string message = "Table starting";
 	Logger::getInstance()-> logLine(message, INFO);
-
 	do {
 		this->deal();
 		this->unblockPlayers();
@@ -62,6 +61,10 @@ void Table::run(){
 		Logger::getInstance()-> logLine(message, INFO);
 	} while(!this->scoreboard.trackLost(playerId));
 
+	message = "Table - GAME OVER";
+	Logger::getInstance()-> logLine(message, INFO);
+
+	this->notifyGameOver();
 	// game is over
 }
 
