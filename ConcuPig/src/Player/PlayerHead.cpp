@@ -51,6 +51,9 @@ Card PlayerHead::retrieveCardToSend()
 	for(unsigned int indexCard = 0 ; indexCard < this->hand.size() ; indexCard++)
 	{
 		Card card = this->hand[indexCard];
+
+		dictionary[card.getNumber()] += 1;
+
 		std::map<char, int>::iterator it = dictionary.find(card.getNumber());
 		int ocurrencies = 1;
 		if( dictionary.end() != it )
@@ -140,11 +143,15 @@ void PlayerHead::run()
 	{
 		this->hand.clear();
 
-//		if (this->gameOver){
-//			message = "Exiting game";
-//			Logger::getInstance()->logPlayer(this->number, message, INFO);
-//			break;
-//		}
+		message = "dealtSemaphore.wait";
+		Logger::getInstance()->logPlayer(this->number, message, INFO);
+		dealtSemaphore.wait();
+
+		if (this->gameOver){
+			message = "Exiting game";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
+			break;
+		}
 
 		for( int i = 0 ; i < 4 ; i++)
 		{
@@ -160,10 +167,6 @@ void PlayerHead::run()
 		}
 
 		this->logHand();
-
-		message = "dealtSemaphore.wait";
-		Logger::getInstance()->logPlayer(this->number, message, INFO);
-		dealtSemaphore.wait();
 
 		this->playingRound = true;
 /*
@@ -256,6 +259,7 @@ int PlayerHead::handleSignal (int signum){
 		kill(this->receiverProcessId, SignalNumbers::GameOver);
 		kill(this->senderProcessId, SignalNumbers::GameOver);
 		this->gameOver = true;
+		this->playingRound = false;
 	}
 	else {
 		return -1;

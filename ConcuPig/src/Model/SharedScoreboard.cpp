@@ -17,7 +17,6 @@ SharedScoreboard::SharedScoreboard(int players, bool initializeValues){
 	this->players = players;
 	for (int i = 0; i < players; i++) {
 		Score* s = new Score(i, initializeValues);
-		int score = s->getScore();
 		this->playerScores.push_back(s);
 	}
 }

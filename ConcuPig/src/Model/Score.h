@@ -9,6 +9,7 @@ class Score {
 private:
 	SharedMemory<int> sharedScore;
 	std::string fileName;
+	int playerNumber;
 
 public:
 

@@ -28,11 +28,10 @@ int main(int argc, char* argv[]) {
 	srand( time( NULL ) ^ getpid() << 16 );
 //	if (argc != 2){
 //		std::cout << "Usage is ConcuPig <numberOfPlayers>" << endl;
-//		std::cin.get();
 //		return 0;
 //	}
-
-	// int players = Convert::ToInt(argv[1]);
+//
+//	 int players = Convert::ToInt(argv[1]);
 
 	int players = 4;
 
