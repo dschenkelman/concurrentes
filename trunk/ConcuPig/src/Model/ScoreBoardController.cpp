@@ -10,7 +10,7 @@
 
 using namespace std;
 
-ScoreBoardController::ScoreBoardController(){ }
+ScoreBoardController::ScoreBoardController(int players): scoreBoardMemory(players){ }
 
 ScoreBoardController::~ScoreBoardController() { }
 
@@ -18,7 +18,7 @@ void ScoreBoardController::run()
 {
 	char readKey;
 	bool reloop = true;
-	std::string message = "Press ESC to exit, another key to see the ScoreBoar";
+	std::string message = "Press ESC to exit, another key to see the ScoreBoard";
 
 	do
 	{

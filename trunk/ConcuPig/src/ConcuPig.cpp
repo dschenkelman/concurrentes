@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 	}
 	else {
 		if (fork() == 0){
-			ScoreBoardController controller;
+			ScoreBoardController controller(players);
 			controller.run();
 		}
 		else {

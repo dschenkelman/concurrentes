@@ -22,6 +22,8 @@ public:
 	static std::string getSharedCardFileName(const std::string& cardType, int playerNumber);
 	static key_t getScoreboardKey();
 	static std::string getScoreboardFileName();
+	static key_t getSharedScoreKey(int player);
+	static std::string getSharedScoreFileName(int player);
 };
 
 #endif /* NAMINGSERVICE_H_ */

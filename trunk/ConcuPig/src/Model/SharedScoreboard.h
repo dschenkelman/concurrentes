@@ -10,11 +10,16 @@
 
 #include "../Concurrency/SharedMemory.h"
 #include "../Model/Scoreboard.h"
+#include "../Model/Score.h"
+#include <vector>
 
 class SharedScoreboard {
 	SharedMemory<Scoreboard> scoreboardMemory;
+	std::vector< Score > playerScores;
+	int players;
+
 public:
-	SharedScoreboard();
+	SharedScoreboard(int players);
 	void print();
 	bool trackLost(int playerId);
 	virtual ~SharedScoreboard();

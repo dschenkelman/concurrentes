@@ -21,7 +21,8 @@ Table::Table(int numberOfPlayers, int syncProcess, std::vector<pid_t>& playerPro
 handDownFifo(NamingService::getHandDownFifoName()),
 numberOfPlayers(numberOfPlayers),
 playerProcesses(playerProcesses),
-syncProcessId(syncProcess){
+syncProcessId(syncProcess),
+scoreboard(numberOfPlayers){
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Fifo f(NamingService::getDealingFifoName(i));
 		this->dealingFifos.push_back(f);
