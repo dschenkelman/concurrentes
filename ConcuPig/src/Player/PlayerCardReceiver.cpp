@@ -26,7 +26,7 @@ PlayerCardReceiver::~PlayerCardReceiver(){
 }
 
 void PlayerCardReceiver::run(){
-	while(this->gameOver){
+	while(!this->gameOver){
 		Logger *logger = Logger::getInstance();
 
 		string logLine = "Waiting on Receiver Semaphore";
