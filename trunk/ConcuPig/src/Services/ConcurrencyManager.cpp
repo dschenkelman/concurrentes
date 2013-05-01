@@ -9,21 +9,22 @@
 #include "NamingService.h"
 #include "../Constants/SharedMemoryNames.h"
 #include "../Constants/SemaphoreNames.h"
-#include "../Concurrency/Semaphore.h"
-
 #include <string>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include "../Services/Logger.h"
 
 using namespace std;
 
 ConcurrencyManager::ConcurrencyManager(int players) : players(players) {
+	this->scoreboard = NULL;
 }
 
 void ConcurrencyManager::initialize(){
 	this->initializeSharedMemories();
 	this->initializeSemaphores();
+	this->initializeFifos();
 }
 
 void ConcurrencyManager::initializeSharedMemories(){
@@ -36,6 +37,16 @@ void ConcurrencyManager::initializeSharedMemories(){
 	}
 
 	this->createFile(NamingService::getScoreboardFileName());
+
+	string message = "Before creating scoreboard";
+
+	Logger::getInstance()->logLine(message, INFO);
+
+//	this->scoreboard = new SharedScoreboard(this->players);
+//
+//	message = "After creating scoreboard";
+//
+//	Logger::getInstance()->logLine(message, INFO);
 }
 
 void ConcurrencyManager::initializeSemaphores(){
@@ -56,6 +67,23 @@ void ConcurrencyManager::initializeSemaphores(){
 	}
 }
 
+void ConcurrencyManager::initializeFifos(){
+	for (int i = 0; i < this->players; i++){
+		this->openFifo(NamingService::getCardPassingFifoFileName(i, (i + 1) % this->players));
+		this->openFifo(NamingService::getDealingFifoName(i));
+	}
+
+	this->openFifo(NamingService::getHandDownFifoName());
+	this->openFifo(NamingService::getPlayersReadyFifoName());
+}
+
+void ConcurrencyManager::openFifo(const string& name){
+	Fifo f(name);
+	f.openRead(false);
+	f.openWrite();
+	this->fifos.push_back(f);
+}
+
 void ConcurrencyManager::initializeSemaphore(key_t key, int initialValue){
 	Semaphore s(key);
 	s.initialize(initialValue);
@@ -66,6 +94,11 @@ void ConcurrencyManager::terminate(){
 	for (unsigned int i = 0; i < this->semaphores.size(); i++) {
 		this->semaphores[i].eliminate();
 	}
+
+	for (unsigned int i = 0; i < this->fifos.size(); i++) {
+		this->fifos[i].closeFifo();
+		this->fifos[i].eliminate();
+	}
 }
 
 void ConcurrencyManager::createFile(const string& fileName){
@@ -75,4 +108,8 @@ void ConcurrencyManager::createFile(const string& fileName){
 }
 
 ConcurrencyManager::~ConcurrencyManager() {
+//	if (this->scoreboard != NULL){
+//		delete this->scoreboard;
+//		this->scoreboard = NULL;
+//	}
 }

@@ -12,14 +12,20 @@
 #include <sys/types.h>
 #include <vector>
 #include "../Concurrency/Semaphore.h"
+#include "../Concurrency/Fifo.h"
+#include "../Model/SharedScoreboard.h"
 
 class ConcurrencyManager {
 private:
 	int players;
 	std::vector<Semaphore> semaphores;
+	std::vector<Fifo> fifos;
+	SharedScoreboard* scoreboard;
 	void initializeSharedMemories(void);
 	void initializeSemaphores(void);
+	void initializeFifos(void);
 	void initializeSemaphore(key_t key, int initialValue);
+	void openFifo(const std::string& name);
 	void terminateSemaphores(key_t key, int initialValue);
 	void createFile(const std::string& fileName);
 public:

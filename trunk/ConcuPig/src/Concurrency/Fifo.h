@@ -22,6 +22,8 @@ class Fifo {
 		Fifo (const std::string& name);
 		virtual ~Fifo();
 
+		void openWrite();
+		void openRead(bool block);
 		int writeValue(char* value, int valueSize);
 		int readValue(char* buffer, int bufferSize );
 		void closeFifo();
