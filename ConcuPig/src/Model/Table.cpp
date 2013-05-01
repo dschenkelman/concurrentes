@@ -17,11 +17,10 @@
 
 using namespace std;
 
-Table::Table(int numberOfPlayers, int scoreboardProcess, int syncProcess, std::vector<pid_t>& playerProcesses) :
+Table::Table(int numberOfPlayers, int syncProcess, std::vector<pid_t>& playerProcesses) :
 handDownFifo(NamingService::getHandDownFifoName()),
 numberOfPlayers(numberOfPlayers),
 playerProcesses(playerProcesses),
-scoreboardProcessId(scoreboardProcess),
 syncProcessId(syncProcess){
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Fifo f(NamingService::getDealingFifoName(i));
@@ -110,6 +109,8 @@ void Table::notifyGameOver(){
 		Logger::getInstance()-> logLine(message, INFO);
 		kill(this->playerProcesses[i], SignalNumbers::GameOver);
 	}
+
+	kill(this->syncProcessId, SignalNumbers::GameOver);
 }
 
 Table::~Table() {

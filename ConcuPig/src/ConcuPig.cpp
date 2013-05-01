@@ -67,18 +67,17 @@ int main(int argc, char* argv[]) {
 		sync.run();
 	}
 	else {
-		pid_t scoreboardId = fork();
-		if (scoreboardId == 0){
+		if (fork() == 0){
 			ScoreBoardController controller;
 			controller.run();
 		}
 		else {
-			Table table(players, syncId, scoreboardId, playerProcesses);
+			Table table(players, syncId, playerProcesses);
 			table.run();
 
 			int state = 0;
 
-			for (int i = 0; i < (2 + players); i++){
+			for (int i = 0; i < (1 + players); i++){
 				wait(&state);
 			}
 
