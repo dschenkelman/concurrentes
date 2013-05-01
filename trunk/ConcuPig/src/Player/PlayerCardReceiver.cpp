@@ -22,14 +22,15 @@ PlayerCardReceiver::PlayerCardReceiver(int playerNumber, int playerOrigin):
 }
 
 PlayerCardReceiver::~PlayerCardReceiver(){
-
+	string message = "Receiver - Destroying";
+	Logger::getInstance()->logPlayer(this->playerNumber, message, INFO);
 }
 
 void PlayerCardReceiver::run(){
+	string logLine;
+	Logger *logger = Logger::getInstance();
 	while(!this->gameOver){
-		Logger *logger = Logger::getInstance();
-
-		string logLine = "Waiting on Receiver Semaphore";
+		logLine = "Waiting on Receiver Semaphore";
 		logger->logPlayer(this->playerNumber,logLine,INFO);
 		receiverSemaphore.wait();
 
@@ -47,6 +48,9 @@ void PlayerCardReceiver::run(){
 		logger->logPlayer(this->playerNumber,logLine,INFO);
 		receivedSemaphore.signal();
 	}
+
+	logLine = "Receiver - Ending";
+	logger->logPlayer(this->playerNumber,logLine,INFO);
 }
 
 int PlayerCardReceiver::handleSignal (int signum){
