@@ -2,15 +2,19 @@
 #include "../Constants/SemaphoreNames.h"
 #include "../Constants/FifoNames.h"
 #include "../Constants/SharedMemoryNames.h"
+#include "../Concurrency/SignalHandler.h"
+#include "../Constants/SignalNumbers.h"
 
 using namespace std;
 
 PlayerCardSender::PlayerCardSender(int playerNumber, int playerTarget):
+	gameOver(false),
 	senderSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SenderSemaphore,playerNumber)),
 	sentSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SentSemaphore,playerNumber)),
 	fifo(NamingService::getCardPassingFifoFileName(playerNumber,playerTarget)),
 	sharedCard(SharedMemoryNames::CardToSend,playerNumber){
 
+	SignalHandler::getInstance()->registerHandler(SignalNumbers::GameOver, this);
 	this->fifoName = NamingService::getCardPassingFifoFileName(playerNumber,playerTarget);
 	this->playerNumber = playerNumber;
 	this->playerTarget = playerTarget;
@@ -21,7 +25,7 @@ PlayerCardSender::~PlayerCardSender(){
 }
 
 void PlayerCardSender::run(){
-	while(true){
+	while(!this->gameOver){
 		Logger *logger = Logger::getInstance();
 
 		string logLine = "Waiting on Sender Semaphore";
@@ -40,4 +44,15 @@ void PlayerCardSender::run(){
 		logger->logPlayer(this->playerNumber,logLine,INFO);
 		sentSemaphore.signal();
 	}
+}
+
+int PlayerCardSender::handleSignal (int signum){
+	if (signum == SignalNumbers::GameOver){
+		this->gameOver = true;
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
 }

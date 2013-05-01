@@ -7,10 +7,12 @@
 #include "../Services/Logger.h"
 #include "../Helpers/Convert.h"
 #include <string>
+#include "../Concurrency/IEventHandler.h"
 
-class PlayerCardSender{
+class PlayerCardSender : public IEventHandler{
 
 	private:
+		bool gameOver;
 		Semaphore senderSemaphore,sentSemaphore;
 		Fifo fifo;
 		std::string fifoName;
@@ -21,7 +23,7 @@ class PlayerCardSender{
 		PlayerCardSender(int playerNumber, int playerTaget);
 		~PlayerCardSender();
 		void run();
-
+		int handleSignal(int signum);
 };
 
 #endif /* PLAYERCARDSENDER_H_ */
