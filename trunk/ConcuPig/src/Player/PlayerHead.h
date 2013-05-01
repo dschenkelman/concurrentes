@@ -15,6 +15,8 @@ class PlayerHead : public IEventHandler {
 private:
 	bool playingRound;
 	bool gameOver;
+	pid_t receiverProcessId;
+	pid_t senderProcessId;
 	int number, leftPlayerNumber, rightPlayerNumber;
 	std::vector<Card> hand;
 	Semaphore readyToSendReceiveSemaphore,

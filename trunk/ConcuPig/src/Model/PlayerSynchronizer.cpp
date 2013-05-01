@@ -3,10 +3,13 @@
 #include "../Constants/SemaphoreNames.h"
 #include "../Services/Logger.h"
 #include <string>
+#include "../Concurrency/SignalHandler.h"
+#include "../Constants/SignalNumbers.h"
 
 using namespace std;
 
 PlayerSynchronizer::PlayerSynchronizer(int numberOfPlayers):
+	gameOver(false),
 	playersReadyFifo(NamingService::getPlayersReadyFifoName()), numberOfPlayers(numberOfPlayers){
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Semaphore s(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, i));
@@ -19,14 +22,14 @@ PlayerSynchronizer::~PlayerSynchronizer(){
 }
 
 void PlayerSynchronizer::run(){
-	while (true){
+	while (!this->gameOver){
 		int playerId = -1;
 
 		string line = "Sync - Starting";
 		Logger::getInstance()->logLine(line, INFO);
 
 		int playersReady = 0;
-		while(playersReady != this->numberOfPlayers){
+		while(playersReady != this->numberOfPlayers && !this->gameOver){
 			string line = "Sync - Reading players ready FIFO";
 			Logger::getInstance()->logLine(line, INFO);
 
@@ -53,4 +56,15 @@ void PlayerSynchronizer::unblockPlayers(void){
 		string line = "Sync - Unblocked player " + Convert::ToString(i);
 		Logger::getInstance()->logLine(line, INFO);
 	}
+}
+
+int PlayerSynchronizer::handleSignal (int signum){
+	if (signum == SignalNumbers::GameOver){
+		this->gameOver = true;
+	}
+	else {
+		return -1;
+	}
+
+	return 0;
 }
