@@ -131,10 +131,11 @@ bool PlayerHead::isWinningHand()
 
 void PlayerHead::run()
 {
+	std::string message;
+
 	while(!this->gameOver)
 	{
 		this->hand.clear();
-		std::string message;
 		for( int i = 0 ; i < 4 ; i++)
 		{
 			char serializedCard[2];
@@ -214,6 +215,9 @@ void PlayerHead::run()
 			}
 		}
 	}
+
+	message = "Head - Ending";
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
 }
 
 void PlayerHead::logHand(){
@@ -248,4 +252,6 @@ int PlayerHead::handleSignal (int signum){
 }
 
 PlayerHead::~PlayerHead() {
+	string message = "Head - Destroying";
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
 }

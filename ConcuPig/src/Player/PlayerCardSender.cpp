@@ -22,13 +22,16 @@ PlayerCardSender::PlayerCardSender(int playerNumber, int playerTarget):
 }
 
 PlayerCardSender::~PlayerCardSender(){
+	string message = "Sender - Destroying";
+	Logger::getInstance()->logPlayer(this->playerNumber, message, INFO);
 }
 
 void PlayerCardSender::run(){
-	while(!this->gameOver){
-		Logger *logger = Logger::getInstance();
+	Logger *logger = Logger::getInstance();
 
-		string logLine = "Waiting on Sender Semaphore";
+	string logLine;
+	while(!this->gameOver){
+		logLine = "Waiting on Sender Semaphore";
 		logger->logPlayer(this->playerNumber,logLine,INFO);
 		senderSemaphore.wait();
 
@@ -44,6 +47,9 @@ void PlayerCardSender::run(){
 		logger->logPlayer(this->playerNumber,logLine,INFO);
 		sentSemaphore.signal();
 	}
+
+	logLine = "Sender - Ending";
+	logger->logPlayer(this->playerNumber,logLine,INFO);
 }
 
 int PlayerCardSender::handleSignal (int signum){
