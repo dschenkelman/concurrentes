@@ -19,6 +19,7 @@ using namespace std;
 
 PlayerHead::PlayerHead( int playerNumber, int leftPlayerNumber, int rightPlayerNumber) :
 playingRound(false),
+gameOver(false),
 number(playerNumber),
 	leftPlayerNumber(leftPlayerNumber),
 	rightPlayerNumber(rightPlayerNumber),
@@ -35,6 +36,7 @@ number(playerNumber),
 	dealtFifo(NamingService::getDealingFifoName(playerNumber))
 {
 	SignalHandler::getInstance()->registerHandler(SignalNumbers::PlayerWon, this);
+	SignalHandler::getInstance()->registerHandler(SignalNumbers::GameOver, this);
 	createSubProcess();
 }
 
@@ -161,7 +163,7 @@ bool PlayerHead::isWinningHand()
 
 void PlayerHead::run()
 {
-	while( true )
+	while(!this->gameOver)
 	{
 		std::string message;
 		for( int i = 0 ; i < 4 ; i++)
@@ -256,10 +258,6 @@ void PlayerHead::logHand(){
 
 int PlayerHead::handleSignal (int signum){
 	if (signum != SignalNumbers::PlayerWon){
-		return -1;
-	}
-
-	{
 		Lock l(NamingService::getDealingFifoName(this->number));
 		if (this->playingRound){
 			this->playingRound = false;
@@ -267,6 +265,12 @@ int PlayerHead::handleSignal (int signum){
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			informMyHandIsOnTheTable();
 		}
+	}
+	else if (signum == SignalNumbers::GameOver){
+		this->gameOver = true;
+	}
+	else {
+		return -1;
 	}
 
 	return 0;

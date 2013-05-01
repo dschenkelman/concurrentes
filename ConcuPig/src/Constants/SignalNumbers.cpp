@@ -8,3 +8,4 @@
 #include "SignalNumbers.h"
 
 const int SignalNumbers::PlayerWon = 60;
+const int SignalNumbers::GameOver = 61;

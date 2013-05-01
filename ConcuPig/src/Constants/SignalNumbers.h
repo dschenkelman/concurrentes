@@ -11,6 +11,7 @@
 class SignalNumbers {
 public:
 	static const int PlayerWon;
+	static const int GameOver;
 };
 
 #endif /* SIGNALNUMBERS_H_ */
