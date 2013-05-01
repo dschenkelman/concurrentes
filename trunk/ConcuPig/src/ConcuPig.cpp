@@ -44,6 +44,8 @@ int main(int argc, char* argv[]) {
 	ConcurrencyManager manager(players);
 	manager.initialize();
 
+	SharedScoreboard scoreboard(players, true);
+
 	int startedPlayers = 0;
 	vector<pid_t> playerProcesses;
 
@@ -99,15 +101,14 @@ int main(int argc, char* argv[]) {
 	}
 	else {
 		if (fork() == 0){
-			ScoreBoardController controller(players);
-			controller.run();
-		}
-		else {
 			Table table(players, syncId, playerProcesses);
 			table.run();
+		}
+		else {
+			ScoreBoardController controller(players);
+			controller.run();
 
-			SharedScoreboard s(players, false);
-			s.print();
+			scoreboard.print();
 
 			manager.terminate();
 			cout << "Game over" << endl;

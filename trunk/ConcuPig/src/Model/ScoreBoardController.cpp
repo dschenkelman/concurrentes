@@ -11,7 +11,7 @@
 
 using namespace std;
 
-ScoreBoardController::ScoreBoardController(int players): scoreBoardMemory(players, true){ }
+ScoreBoardController::ScoreBoardController(int players): scoreBoardMemory(players, false){ }
 
 ScoreBoardController::~ScoreBoardController() {
 	string message = "Destroying scoreboard controller";
@@ -22,13 +22,13 @@ void ScoreBoardController::run()
 {
 char readKey;
 bool reloop = true;
-std::string message = "Press ESC to exit, another key to see the ScoreBoard";
+std::string message = "Press q to exit, another key to see the ScoreBoard";
 
-do
-{
-	cout << message << endl;
+	do
+	{
+		cout << message << endl;
 		readKey = getchar();
-		if(ESC_CODE == readKey )
+		if('q' == readKey )
 		{
 			reloop = false;
 		}else
