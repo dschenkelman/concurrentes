@@ -5,10 +5,13 @@
 #include "../Concurrency/SignalHandler.h"
 #include "../Constants/SignalNumbers.h"
 
+#define SIG_ATOMIC_FALSE 0
+#define SIG_ATOMIC_TRUE 1
+
 using namespace std;
 
 PlayerCardSender::PlayerCardSender(int playerNumber, int playerTarget):
-	gameOver(false),
+	gameOver(SIG_ATOMIC_FALSE),
 	senderSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SenderSemaphore,playerNumber)),
 	sentSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SentSemaphore,playerNumber)),
 	fifo(NamingService::getCardPassingFifoFileName(playerNumber,playerTarget)),
@@ -30,7 +33,7 @@ void PlayerCardSender::run(){
 	Logger *logger = Logger::getInstance();
 
 	string logLine;
-	while(!this->gameOver){
+	while(this->gameOver == SIG_ATOMIC_FALSE){
 		logLine = "Waiting on Sender Semaphore";
 		logger->logPlayer(this->playerNumber,logLine,INFO);
 		senderSemaphore.wait();
@@ -54,7 +57,7 @@ void PlayerCardSender::run(){
 
 int PlayerCardSender::handleSignal (int signum){
 	if (signum == SignalNumbers::GameOver){
-		this->gameOver = true;
+		this->gameOver = SIG_ATOMIC_TRUE;
 	}
 	else {
 		return -1;

@@ -7,12 +7,13 @@
 #include "../Services/Logger.h"
 #include "../Helpers/Convert.h"
 #include <string>
+#include <signal.h>
 #include "../Concurrency/IEventHandler.h"
 
 class PlayerCardSender : public IEventHandler{
 
 	private:
-		bool gameOver;
+		sig_atomic_t gameOver;
 		Semaphore senderSemaphore,sentSemaphore;
 		Fifo fifo;
 		std::string fifoName;

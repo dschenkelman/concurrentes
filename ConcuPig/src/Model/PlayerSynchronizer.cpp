@@ -6,10 +6,13 @@
 #include "../Concurrency/SignalHandler.h"
 #include "../Constants/SignalNumbers.h"
 
+#define SIG_ATOMIC_FALSE 0
+#define SIG_ATOMIC_TRUE 1
+
 using namespace std;
 
 PlayerSynchronizer::PlayerSynchronizer(int numberOfPlayers):
-	gameOver(false),
+	gameOver(SIG_ATOMIC_FALSE),
 	playersReadyFifo(NamingService::getPlayersReadyFifoName()), numberOfPlayers(numberOfPlayers){
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Semaphore s(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, i));
@@ -22,14 +25,14 @@ PlayerSynchronizer::~PlayerSynchronizer(){
 }
 
 void PlayerSynchronizer::run(){
-	while (!this->gameOver){
+	while (this->gameOver == SIG_ATOMIC_FALSE){
 		int playerId = -1;
 
 		string line = "Sync - Starting";
 		Logger::getInstance()->logLine(line, INFO);
 
 		int playersReady = 0;
-		while(playersReady != this->numberOfPlayers && !this->gameOver){
+		while(playersReady != this->numberOfPlayers && (this->gameOver == SIG_ATOMIC_FALSE)){
 			string line = "Sync - Reading players ready FIFO";
 			Logger::getInstance()->logLine(line, INFO);
 
@@ -60,7 +63,7 @@ void PlayerSynchronizer::unblockPlayers(void){
 
 int PlayerSynchronizer::handleSignal (int signum){
 	if (signum == SignalNumbers::GameOver){
-		this->gameOver = true;
+		this->gameOver = SIG_ATOMIC_TRUE;
 	}
 	else {
 		return -1;

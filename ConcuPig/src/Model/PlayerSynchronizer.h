@@ -4,12 +4,13 @@
 #include "../Concurrency/Fifo.h"
 #include "../Concurrency/Semaphore.h"
 #include <vector>
+#include <signal.h>
 #include "../Concurrency/IEventHandler.h"
 
 class PlayerSynchronizer : public IEventHandler {
 
 	private:
-		bool gameOver;
+		sig_atomic_t gameOver;
 		Fifo playersReadyFifo;
 		int numberOfPlayers;
 		std::vector<Semaphore> playersReadySemaphores;
