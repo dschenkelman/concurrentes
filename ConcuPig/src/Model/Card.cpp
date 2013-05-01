@@ -24,7 +24,7 @@ char Card::getSymbol()
 }
 
 string Card::toString(){
-	return "Number: " + Convert::ToString((int)this->number) + "Symbol: " + Convert::ToString((int) this->symbol);
+	return "N;S = " + Convert::ToString((int)this->number) + ";" + Convert::ToString((int) this->symbol);
 }
 
 Card::~Card() { }
