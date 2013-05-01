@@ -101,8 +101,4 @@ void ConcurrencyManager::createFile(const string& fileName){
 }
 
 ConcurrencyManager::~ConcurrencyManager() {
-//	if (this->scoreboard != NULL){
-//		delete this->scoreboard;
-//		this->scoreboard = NULL;
-//	}
 }

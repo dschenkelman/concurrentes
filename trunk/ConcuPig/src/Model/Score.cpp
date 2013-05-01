@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Score::Score (int playerNumber, bool initializeValue){
+Score::Score (int playerNumber, bool initializeValue) : playerNumber(playerNumber){
 	key_t scoreKey = NamingService::getSharedScoreKey(playerNumber);
 
 	this->fileName = NamingService::getSharedScoreFileName(playerNumber);
@@ -30,7 +30,7 @@ Score::~Score(){
 
 void Score::setScore(int score){
 	Lock l(this->fileName);
-	string message = "Setting score " + Convert::ToString(score) + " for player " + Convert::ToString(score);
+
 	this->sharedScore.setValue(score);
 }
 
@@ -45,6 +45,9 @@ bool Score::trackLost(){
 	score += 1;
 
 	this->setScore(score);
+
+	string message = "Setting score " + Convert::ToString(score) + " for player " + Convert::ToString(this->playerNumber);
+//	Logger::getInstance()->logLine(message, INFO);
 
 	return (score == 7);
 }

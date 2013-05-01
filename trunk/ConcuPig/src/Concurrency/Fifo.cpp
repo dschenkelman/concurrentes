@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>
+#include "../Services/Logger.h"
 
 using namespace std;
 
@@ -53,9 +54,13 @@ int Fifo :: readValue(char* buffer, int buffSize ) {
 }
 
 void Fifo :: closeFifo () {
+	string message = "Closing FIFO";
+	Logger::getInstance()->logLine(message, INFO);
 	close(this->fileDescriptor);
 }
 
 void Fifo :: eliminate () {
+	string message = "Eliminating FIFO";
+	Logger::getInstance()->logLine(message, INFO);
 	unlink(this->name.c_str());
 }
