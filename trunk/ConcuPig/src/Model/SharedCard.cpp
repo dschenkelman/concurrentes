@@ -1,4 +1,6 @@
 #include "SharedCard.h"
+#include "../Services/Logger.h"
+#include <string>
 
 using namespace std;
 
@@ -17,6 +19,10 @@ SharedCard::~SharedCard(){
 	Lock l(this->fileName);
 
 	this->sharedCardMemory.release();
+
+	string message = "Releasing card";
+
+	Logger::getInstance()->logLine(message, INFO);
 }
 
 

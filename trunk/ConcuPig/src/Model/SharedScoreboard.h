@@ -14,12 +14,11 @@
 #include <vector>
 
 class SharedScoreboard {
-	SharedMemory<Scoreboard> scoreboardMemory;
-	std::vector< Score > playerScores;
+	std::vector<Score*> playerScores;
 	int players;
 
 public:
-	SharedScoreboard(int players);
+	SharedScoreboard(int players, bool initializeValues);
 	void print();
 	bool trackLost(int playerId);
 	virtual ~SharedScoreboard();

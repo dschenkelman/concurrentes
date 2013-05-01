@@ -22,7 +22,7 @@ handDownFifo(NamingService::getHandDownFifoName()),
 numberOfPlayers(numberOfPlayers),
 playerProcesses(playerProcesses),
 syncProcessId(syncProcess),
-scoreboard(numberOfPlayers){
+scoreboard(numberOfPlayers, false){
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Fifo f(NamingService::getDealingFifoName(i));
 		this->dealingFifos.push_back(f);
@@ -118,4 +118,7 @@ Table::~Table() {
 	for (unsigned int i = 0; i < this->dealingFifos.size(); i++) {
 		this->dealingFifos[i].closeFifo();
 	}
+
+	string message = "Destroying table";
+	Logger::getInstance()-> logLine(message, INFO);
 }
