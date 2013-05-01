@@ -15,12 +15,15 @@
 #include <cstdlib>
 #include <algorithm>
 
+#define SIG_ATOMIC_FALSE 0
+#define SIG_ATOMIC_TRUE 1
+
 using namespace std;
 
 
 PlayerHead::PlayerHead( int playerNumber, pid_t receiverProcess, pid_t senderProcess) :
-playingRound(false),
-gameOver(false),
+playingRound(SIG_ATOMIC_FALSE),
+gameOver(SIG_ATOMIC_FALSE),
 receiverProcessId(receiverProcess),
 senderProcessId(senderProcess),
 number(playerNumber),
@@ -139,7 +142,7 @@ void PlayerHead::run()
 	std::string message;
 
 	int playingGameRound = 0;
-	while(!this->gameOver)
+	while( this->gameOver == SIG_ATOMIC_FALSE)
 	{
 		this->hand.clear();
 
@@ -147,7 +150,7 @@ void PlayerHead::run()
 		Logger::getInstance()->logPlayer(this->number, message, INFO);
 		dealtSemaphore.wait();
 
-		if (this->gameOver){
+		if (this->gameOver == SIG_ATOMIC_TRUE){
 			message = "Exiting game";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			break;
@@ -168,7 +171,7 @@ void PlayerHead::run()
 
 		this->logHand();
 
-		this->playingRound = true;
+		this->playingRound = SIG_ATOMIC_TRUE;
 /*
 		if( isWinningHand() )
 		{
@@ -178,7 +181,7 @@ void PlayerHead::run()
 		*/
 
 		int playingRoundHand = 0;
-		while( playingRound )
+		while( playingRound == SIG_ATOMIC_TRUE)
 		{
 			message = "Playing round = " + Convert::ToString(playingRoundHand);
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
@@ -220,8 +223,8 @@ void PlayerHead::run()
 			{
 				{
 					Lock l(NamingService::getDealingFifoName(this->number));
-					if (this->playingRound){
-						this->playingRound = false;
+					if (this->playingRound == SIG_ATOMIC_TRUE){
+						this->playingRound = SIG_ATOMIC_FALSE;
 						message = "Player put down hand (winner)";
 						Logger::getInstance()->logPlayer(this->number, message, INFO);
 						informMyHandIsOnTheTable();
@@ -249,7 +252,7 @@ int PlayerHead::handleSignal (int signum){
 	if (signum == SignalNumbers::PlayerWon){
 		Lock l(NamingService::getDealingFifoName(this->number));
 		if (this->playingRound){
-			this->playingRound = false;
+			this->playingRound = SIG_ATOMIC_FALSE;
 			string message = "Player put down hand (not winner)";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			informMyHandIsOnTheTable();
@@ -258,8 +261,8 @@ int PlayerHead::handleSignal (int signum){
 	else if (signum == SignalNumbers::GameOver){
 		kill(this->receiverProcessId, SignalNumbers::GameOver);
 		kill(this->senderProcessId, SignalNumbers::GameOver);
-		this->gameOver = true;
-		this->playingRound = false;
+		this->gameOver = SIG_ATOMIC_TRUE;
+		this->playingRound = SIG_ATOMIC_FALSE;
 	}
 	else {
 		return -1;

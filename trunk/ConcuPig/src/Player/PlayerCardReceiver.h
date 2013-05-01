@@ -5,12 +5,13 @@
 #include "../Concurrency/Fifo.h"
 #include "../Model/SharedCard.h"
 #include <string>
+#include <signal.h>
 #include "../Concurrency/IEventHandler.h"
 
 class PlayerCardReceiver : public IEventHandler{
 
 	private:
-		bool gameOver;
+		sig_atomic_t gameOver;
 		Semaphore receiverSemaphore,receivedSemaphore;
 		Fifo fifo;
 		SharedCard sharedCard;

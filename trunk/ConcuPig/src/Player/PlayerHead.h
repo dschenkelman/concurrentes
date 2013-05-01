@@ -9,12 +9,13 @@
 #include "../Concurrency/Fifo.h"
 #include "../Concurrency/IEventHandler.h"
 #include <sys/types.h>
+#include <signal.h>
 
 class PlayerHead : public IEventHandler {
 
 private:
-	bool playingRound;
-	bool gameOver;
+	sig_atomic_t playingRound;
+	sig_atomic_t gameOver;
 	pid_t receiverProcessId;
 	pid_t senderProcessId;
 	int number;
