@@ -8,25 +8,34 @@
 #include "SharedScoreboard.h"
 #include "../Services/NamingService.h"
 #include "../Concurrency/Lock.h"
+#include "../Helpers/Convert.h"
 
-SharedScoreboard::SharedScoreboard(){
-	Lock l(NamingService::getScoreboardFileName());
-	this->scoreboardMemory.create(NamingService::getScoreboardKey());
+#include <iostream>
+using namespace std;
+
+SharedScoreboard::SharedScoreboard(int players){
+	this->players = players;
+	for (int i = 0; i < players; i++) {
+		Score s(i);
+		this->playerScores.push_back(s);
+	}
+
 }
 
 void SharedScoreboard::print(){
-	Lock l(NamingService::getScoreboardFileName());
-
-	this->scoreboardMemory.getValue().print();
+	for (int i = 0; i < this->players; i++) {
+		int score = this->playerScores[i].getScore();
+		cout << "Player " << Convert::ToString(i) << " score: " << Convert::ToString(score) << endl;
+	}
 }
 
 bool SharedScoreboard::trackLost(int playerId){
-	Lock l(NamingService::getScoreboardFileName());
 
-	return this->scoreboardMemory.getValue().trackLost(playerId);
+	return this->playerScores[playerId].trackLost();
 }
 
 SharedScoreboard::~SharedScoreboard() {
-	Lock l(NamingService::getScoreboardFileName());
-	this->scoreboardMemory.release();
+	for (int i = 0; i < this->players; i++) {
+		this->playerScores[i].~Score();
+	}
 }

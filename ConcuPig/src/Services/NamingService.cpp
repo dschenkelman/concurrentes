@@ -50,3 +50,14 @@ key_t NamingService::getScoreboardKey(){
 string NamingService::getScoreboardFileName(){
 	return SharedMemoryNames::Scoreboard;
 }
+
+key_t NamingService::getSharedScoreKey(int player){
+	string fileName = getSharedScoreFileName(player);
+	return ftok(fileName.c_str(), 'a');
+}
+
+string NamingService::getSharedScoreFileName(int player){
+	return SharedMemoryNames::Score + Convert::ToString(player);
+}
+
+

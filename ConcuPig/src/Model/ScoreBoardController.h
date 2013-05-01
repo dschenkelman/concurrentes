@@ -16,7 +16,7 @@ private:
 	SharedScoreboard scoreBoardMemory;
 
 public:
-	ScoreBoardController();
+	ScoreBoardController(int players);
 	virtual ~ScoreBoardController();
 
 	void run();

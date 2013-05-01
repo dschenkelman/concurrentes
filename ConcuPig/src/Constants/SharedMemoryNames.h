@@ -15,6 +15,7 @@ public:
 	static const std::string CardToSend;
 	static const std::string CardToReceive;
 	static const std::string Scoreboard;
+	static const std::string Score;
 };
 
 #endif /* SHAREDMEMORYNAMES_H_ */
