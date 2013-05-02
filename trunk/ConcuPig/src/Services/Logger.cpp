@@ -46,5 +46,5 @@ void Logger::logLine(const char* logLine, LoggerLevels logLevel){
 	time (&this->rawtime);
 
 	Lock l(this->logFile);
-	this->file << "Log Level: "<< logLevel <<" - "<< logLine <<" - "<< ctime(&this->rawtime) << flush;
+	this->file << "PId: " << getpid() << " - Log Level: "<< logLevel <<" - "<< logLine <<" - "<< ctime(&this->rawtime) << flush;
 }

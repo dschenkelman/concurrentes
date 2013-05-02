@@ -13,6 +13,7 @@
 #include "../Concurrency/Lock.h"
 #include "../Concurrency/SignalHandler.h"
 #include <cstdlib>
+#include <cstring>
 #include <algorithm>
 
 #define SIG_ATOMIC_FALSE 0
@@ -106,6 +107,7 @@ Card PlayerHead::retrieveCardToSend()
 void PlayerHead::informCardHasBeenSelected()
 {
 	char n[4];
+	memset(n, 0, 4);
 	n[0] = this->number & 255;
 	n[1] = (this->number >> 8 ) & 255;
 	n[2] = (this->number >> 16) & 255;
@@ -120,6 +122,7 @@ void PlayerHead::informCardHasBeenSelected()
 void PlayerHead::informCardHasBeenPicked()
 {
 	char n[4];
+	memset(n, 0, 4);
 	n[0] = this->number & 255;
 	n[1] = (this->number >> 8 ) & 255;
 	n[2] = (this->number >> 16) & 255;
@@ -134,6 +137,7 @@ void PlayerHead::informCardHasBeenPicked()
 void PlayerHead::informMyHandIsOnTheTable()
 {
 	char n[4];
+	memset(n, 0, 4);
 	n[0] = this->number & 255;
 	n[1] = (this->number >> 8 ) & 255;
 	n[2] = (this->number >> 16) & 255;
@@ -175,6 +179,7 @@ void PlayerHead::run()
 		for( int i = 0 ; i < 4 ; i++)
 		{
 			char serializedCard[2];
+			memset(serializedCard, 0, 2);
 			message = "dealtFifo.readValue";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			dealtFifo.readValue(serializedCard, 2);
@@ -243,12 +248,12 @@ void PlayerHead::run()
 						this->playingRound = SIG_ATOMIC_FALSE;
 						message = "Player put down hand (winner)";
 						Logger::getInstance()->logPlayer(this->number, message, INFO);
-						informMyHandIsOnTheTable();
+						this->informMyHandIsOnTheTable();
 					}
 				}
 			}
 
-			informCardHasBeenPicked();
+			this->informCardHasBeenPicked();
 			message = "everyBodyPickUpCardSemaphore.wait";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			everyBodyPickUpCardSemaphore.wait();
@@ -272,7 +277,7 @@ void PlayerHead::logHand(){
 int PlayerHead::handleSignal (int signum){
 	if (signum == SignalNumbers::PlayerWon){
 		Lock l(NamingService::getDealingFifoName(this->number));
-		if (this->playingRound){
+		if (this->playingRound == SIG_ATOMIC_TRUE){
 			this->playingRound = SIG_ATOMIC_FALSE;
 			string message = "Player put down hand (not winner)";
 			Logger::getInstance()->logPlayer(this->number, message, INFO);

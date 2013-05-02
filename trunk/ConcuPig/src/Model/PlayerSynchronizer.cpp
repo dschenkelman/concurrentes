@@ -82,17 +82,17 @@ void PlayerSynchronizer::run(){
 
 void PlayerSynchronizer::unblockPlayersReady(void){
 	for (unsigned int i = 0; i < this->playersReadySemaphores.size(); i++) {
-		this->playersReadySemaphores[i].signal();
-		string line = "Sync - Unblocked player ready " + Convert::ToString(i);
+		string line = "Sync - Unblocked player readying " + Convert::ToString(i);
 		Logger::getInstance()->logLine(line, INFO);
+		this->playersReadySemaphores[i].signal();
 	}
 }
 
 void PlayerSynchronizer::unblockPlayersFinished(void){
 	for (unsigned int i = 0; i < this->playersEverybodyPickUpCardSemaphores.size(); i++) {
-		this->playersEverybodyPickUpCardSemaphores[i].signal();
-		string line = "Sync - Unblocked player finished " + Convert::ToString(i);
+		string line = "Sync - Unblocked player finishing " + Convert::ToString(i);
 		Logger::getInstance()->logLine(line, INFO);
+		this->playersEverybodyPickUpCardSemaphores[i].signal();
 	}
 }
 

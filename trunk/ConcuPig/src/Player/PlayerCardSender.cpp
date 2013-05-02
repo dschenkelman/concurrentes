@@ -4,6 +4,7 @@
 #include "../Constants/SharedMemoryNames.h"
 #include "../Concurrency/SignalHandler.h"
 #include "../Constants/SignalNumbers.h"
+#include <cstring>
 
 #define SIG_ATOMIC_FALSE 0
 #define SIG_ATOMIC_TRUE 1
@@ -39,11 +40,12 @@ void PlayerCardSender::run(){
 		senderSemaphore.wait();
 
 		char cardToSend [2];
+		memset(cardToSend, 0, 2);
 		this->sharedCard.serialize(cardToSend);
 
 		logLine = "Writing on FIFO "+this->fifoName+" from Player: "+Convert::ToString(this->playerNumber)+" to: Player: "+
 				Convert::ToString(this->playerTarget);
-		logger->logLine(logLine,INFO);
+		logger->logPlayer(this->playerNumber, logLine,INFO);
 		this->fifo.writeValue(cardToSend, sizeof(char) * 2);
 
 		logLine = "Signaling on Sent Semaphore";
@@ -58,10 +60,8 @@ void PlayerCardSender::run(){
 int PlayerCardSender::handleSignal (int signum){
 	if (signum == SignalNumbers::GameOver){
 		this->gameOver = SIG_ATOMIC_TRUE;
-	}
-	else {
-		return -1;
+		return 0;
 	}
 
-	return 0;
+	return -1;
 }

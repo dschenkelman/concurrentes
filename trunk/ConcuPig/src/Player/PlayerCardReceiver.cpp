@@ -5,6 +5,7 @@
 #include "../Services/Logger.h"
 #include "../Concurrency/SignalHandler.h"
 #include "../Constants/SignalNumbers.h"
+#include <cstring>
 
 #define SIG_ATOMIC_FALSE 0
 #define SIG_ATOMIC_TRUE 1
@@ -38,9 +39,10 @@ void PlayerCardReceiver::run(){
 		receiverSemaphore.wait();
 
 		char cardReceived [2];
+		memset(cardReceived, 0, 2);
 		logLine = "Reading from FIFO "+this->fifoName+". Sent by Player: "+Convert::ToString(this->playerOrigin)+" to: Player: "+
 						Convert::ToString(this->playerNumber);
-		logger->logLine(logLine,INFO);
+		logger->logPlayer(this->playerNumber, logLine, INFO);
 		this->fifo.readValue(cardReceived, sizeof(char) * 2);
 
 		logLine = "Deserializing and writing new card on shared memory";
