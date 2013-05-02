@@ -13,10 +13,15 @@ using namespace std;
 
 PlayerSynchronizer::PlayerSynchronizer(int numberOfPlayers):
 	gameOver(SIG_ATOMIC_FALSE),
-	playersReadyFifo(NamingService::getPlayersReadyFifoName()), numberOfPlayers(numberOfPlayers){
+	playersReadyFifo(NamingService::getPlayersReadyFifoName()),
+	playersEverybodyPickUpCardFifo(NamingService::getPlayersEverybodyPickUpCardFifoName()),
+	numberOfPlayers(numberOfPlayers){
 	for (int i = 0; i < numberOfPlayers; ++i) {
 		Semaphore s(NamingService::getSemaphoreKey(SemaphoreNames::ReadyToSendReceive, i));
 		this->playersReadySemaphores.push_back(s);
+
+		Semaphore a(NamingService::getSemaphoreKey(SemaphoreNames::EverybodyPickUpCardSemaphore, i));
+		this->playersEverybodyPickUpCardSemaphores.push_back(a);
 	}
 }
 
@@ -49,14 +54,44 @@ void PlayerSynchronizer::run(){
 			Logger::getInstance()->logLine(line, INFO);
 		}
 
-		this->unblockPlayers();
+		this->unblockPlayersReady();
+
+		line = "Sync - Finishing round synchronization";
+		Logger::getInstance()->logLine(line, INFO);
+
+		int playersFinished = 0;
+		while(playersFinished != this->numberOfPlayers && (this->gameOver == SIG_ATOMIC_FALSE)){
+			string line = "Sync - Reading players finished FIFO";
+			Logger::getInstance()->logLine(line, INFO);
+
+			char id[4];
+			this->playersEverybodyPickUpCardFifo.readValue(id, sizeof(char) * 4);
+			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
+
+			line = "Sync - Player Id finished in Sync: " + Convert::ToString(playerId);
+			Logger::getInstance()->logLine(line, INFO);
+			playersFinished++;
+
+			line = "Sync - Players finished: " + Convert::ToString(playersFinished);
+			Logger::getInstance()->logLine(line, INFO);
+		}
+
+		this->unblockPlayersFinished();
 	}
 }
 
-void PlayerSynchronizer::unblockPlayers(void){
+void PlayerSynchronizer::unblockPlayersReady(void){
 	for (unsigned int i = 0; i < this->playersReadySemaphores.size(); i++) {
 		this->playersReadySemaphores[i].signal();
-		string line = "Sync - Unblocked player " + Convert::ToString(i);
+		string line = "Sync - Unblocked player ready " + Convert::ToString(i);
+		Logger::getInstance()->logLine(line, INFO);
+	}
+}
+
+void PlayerSynchronizer::unblockPlayersFinished(void){
+	for (unsigned int i = 0; i < this->playersEverybodyPickUpCardSemaphores.size(); i++) {
+		this->playersEverybodyPickUpCardSemaphores[i].signal();
+		string line = "Sync - Unblocked player finished " + Convert::ToString(i);
 		Logger::getInstance()->logLine(line, INFO);
 	}
 }

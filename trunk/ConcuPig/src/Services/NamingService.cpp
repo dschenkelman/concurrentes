@@ -33,6 +33,10 @@ string NamingService::getPlayersReadyFifoName(){
 	return FifoNames::PlayersReady;
 }
 
+string NamingService::getPlayersEverybodyPickUpCardFifoName(){
+	return FifoNames::PlayersEverybodyPickUpCard;
+}
+
 key_t NamingService::getSharedCardKey(const std::string& cardType, int playerNumber){
 	return ftok(getSharedCardFileName(cardType, playerNumber).c_str(), 'a');
 }

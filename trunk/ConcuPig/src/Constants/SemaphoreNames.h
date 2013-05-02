@@ -18,6 +18,7 @@ public:
 	static const std::string ReceivedSemaphore;
 	static const std::string SenderSemaphore;
 	static const std::string SentSemaphore;
+	static const std::string EverybodyPickUpCardSemaphore;
 };
 
 #endif /* SEMAPHORENAMES_H_ */

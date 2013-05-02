@@ -13,3 +13,5 @@ const std::string SemaphoreNames::ReceiverSemaphore = "ReceiverSemaphore";
 const std::string SemaphoreNames::ReceivedSemaphore = "ReceivedSemaphore";
 const std::string SemaphoreNames::SenderSemaphore = "SenderSemaphore";
 const std::string SemaphoreNames::SentSemaphore = "SentSemaphore";
+const std::string SemaphoreNames::EverybodyPickUpCardSemaphore = "EverybodyPickUpCardSemaphore";
+
