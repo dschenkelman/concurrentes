@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 	ConcurrencyManager manager(players);
 	manager.initialize();
 
-	SharedScoreboard scoreboard(players, true);
+	Scoreboard scoreboard(players, true);
 
 	int startedPlayers = 0;
 	vector<pid_t> playerProcesses;

@@ -13,7 +13,6 @@
 #include <vector>
 #include "../Concurrency/Semaphore.h"
 #include "../Concurrency/Fifo.h"
-#include "../Model/SharedScoreboard.h"
 
 class ConcurrencyManager {
 private:

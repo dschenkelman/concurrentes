@@ -1,11 +1,11 @@
 /*
- * SharedScoreboard.cpp
+ * Scoreboard.cpp
  *
  *  Created on: Apr 27, 2013
  *      Author: dschenkelman
  */
 
-#include "SharedScoreboard.h"
+#include "Scoreboard.h"
 #include "../Services/NamingService.h"
 #include "../Concurrency/Lock.h"
 #include "../Helpers/Convert.h"
@@ -13,7 +13,7 @@
 #include <iostream>
 using namespace std;
 
-SharedScoreboard::SharedScoreboard(int players, bool initializeValues){
+Scoreboard::Scoreboard(int players, bool initializeValues){
 	this->players = players;
 	for (int i = 0; i < players; i++) {
 		Score* s = new Score(i, initializeValues);
@@ -21,18 +21,18 @@ SharedScoreboard::SharedScoreboard(int players, bool initializeValues){
 	}
 }
 
-void SharedScoreboard::print(){
+void Scoreboard::print(){
 	for (int i = 0; i < this->players; i++) {
 		int score = this->playerScores[i]->getScore();
 		cout << "Player " << Convert::ToString(i) << " score: " << Convert::ToString(score) << endl;
 	}
 }
 
-bool SharedScoreboard::trackLost(int playerId){
+bool Scoreboard::trackLost(int playerId){
 	return this->playerScores[playerId]->trackLost();
 }
 
-SharedScoreboard::~SharedScoreboard() {
+Scoreboard::~Scoreboard() {
 	for (int i = 0; i < this->playerScores.size(); i++) {
 		delete this->playerScores[i];
 	}
