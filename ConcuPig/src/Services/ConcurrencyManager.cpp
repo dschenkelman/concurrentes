@@ -49,6 +49,7 @@ void ConcurrencyManager::initializeSemaphores(){
 	this->createFile(SemaphoreNames::ReceiverSemaphore);
 	this->createFile(SemaphoreNames::SenderSemaphore);
 	this->createFile(SemaphoreNames::SentSemaphore);
+	this->createFile(SemaphoreNames::EverybodyPickUpCardSemaphore);
 
 	for (int i = 0; i < this->players; i++){
 		this->initializeSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::DealtSemaphore, i), 0);
@@ -57,6 +58,7 @@ void ConcurrencyManager::initializeSemaphores(){
 		this->initializeSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceiverSemaphore, i), 0);
 		this->initializeSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SenderSemaphore, i), 0);
 		this->initializeSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SentSemaphore, i), 0);
+		this->initializeSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::EverybodyPickUpCardSemaphore, i), 0);
 	}
 }
 
@@ -68,6 +70,7 @@ void ConcurrencyManager::initializeFifos(){
 
 	this->openFifo(NamingService::getHandDownFifoName());
 	this->openFifo(NamingService::getPlayersReadyFifoName());
+	this->openFifo(NamingService::getPlayersEverybodyPickUpCardFifoName());
 }
 
 void ConcurrencyManager::openFifo(const string& name){
@@ -92,6 +95,7 @@ void ConcurrencyManager::terminate(){
 		this->fifos[i].closeFifo();
 		this->fifos[i].eliminate();
 	}
+
 }
 
 void ConcurrencyManager::createFile(const string& fileName){

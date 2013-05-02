@@ -33,9 +33,11 @@ number(playerNumber),
 	receivedSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::ReceivedSemaphore, playerNumber)),
 	sentSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::SentSemaphore, playerNumber)),
 	dealtSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::DealtSemaphore, playerNumber)),
+	everyBodyPickUpCardSemaphore(NamingService::getSemaphoreKey(SemaphoreNames::EverybodyPickUpCardSemaphore, playerNumber)),
 	cardToSendMemory(SharedMemoryNames::CardToSend, playerNumber),
 	receivedCardMemory(SharedMemoryNames::CardToReceive, playerNumber),
 	playerReadyFifo(NamingService::getPlayersReadyFifoName()),
+	playersEverybodyPickUpCardFifo(NamingService::getPlayersEverybodyPickUpCardFifoName()),
 	handDownFifo(NamingService::getHandDownFifoName()),
 	dealtFifo(NamingService::getDealingFifoName(playerNumber))
 {
@@ -113,6 +115,20 @@ void PlayerHead::informCardHasBeenSelected()
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
 
 	this->playerReadyFifo.writeValue(n, sizeof(char) * 4);
+}
+
+void PlayerHead::informCardHasBeenPicked()
+{
+	char n[4];
+	n[0] = this->number & 255;
+	n[1] = (this->number >> 8 ) & 255;
+	n[2] = (this->number >> 16) & 255;
+	n[3] = (this->number >> 24 ) & 255;
+
+	std::string message = "playersEverybodyPickUpCardFifo.writeValue";
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
+
+	this->playersEverybodyPickUpCardFifo.writeValue(n, sizeof(char) * 4);
 }
 
 void PlayerHead::informMyHandIsOnTheTable()
@@ -231,6 +247,11 @@ void PlayerHead::run()
 					}
 				}
 			}
+
+			informCardHasBeenPicked();
+			message = "everyBodyPickUpCardSemaphore.wait";
+			Logger::getInstance()->logPlayer(this->number, message, INFO);
+			everyBodyPickUpCardSemaphore.wait();
 		}
 		playingGameRound++;
 	}

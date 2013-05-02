@@ -12,10 +12,13 @@ class PlayerSynchronizer : public IEventHandler {
 	private:
 		sig_atomic_t gameOver;
 		Fifo playersReadyFifo;
+		Fifo playersEverybodyPickUpCardFifo;
 		int numberOfPlayers;
 		std::vector<Semaphore> playersReadySemaphores;
+		std::vector<Semaphore> playersEverybodyPickUpCardSemaphores;
 
-		void unblockPlayers(void);
+		void unblockPlayersReady(void);
+		void unblockPlayersFinished(void);
 
 	public:
 		PlayerSynchronizer(int numberOfPlayers);
