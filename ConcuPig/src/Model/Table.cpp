@@ -14,6 +14,7 @@
 #include "../Helpers/Convert.h"
 #include <signal.h>
 #include <string>
+#include <cstring>
 
 using namespace std;
 
@@ -45,6 +46,7 @@ void Table::run(){
 			Logger::getInstance()-> logLine(message, INFO);
 
 			char id[4];
+			memset(id, 0, 4);
 			this->handDownFifo.readValue(id, sizeof(char) * 4);
 			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
 
@@ -76,6 +78,7 @@ void Table::deal(){
 	while (deck.hasNextCard()){
 		Card card = deck.hit();
 		char c[2];
+		memset(c, 0, 2);
 		card.serialize(c);
 		string m = "Dealing card " + Convert::ToString(i);
 		Logger::getInstance()-> logLine(m, INFO);
@@ -107,12 +110,15 @@ void Table::notifyRoundOver(int winner){
 }
 
 void Table::notifyGameOver(){
+	string message;
 	for (int i = 0; i < this->playerProcesses.size(); ++i) {
-		string message = "Notifying  game over to player - " + Convert::ToString(i);
+		message = "Notifying game over to player - " + Convert::ToString(i);
 		Logger::getInstance()-> logLine(message, INFO);
 		kill(this->playerProcesses[i], SignalNumbers::GameOver);
 	}
 
+	message = "Notifying game over to player Sync";
+	Logger::getInstance()-> logLine(message, INFO);
 	kill(this->syncProcessId, SignalNumbers::GameOver);
 }
 
