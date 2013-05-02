@@ -1,5 +1,4 @@
 #include "ScoreBoardController.h"
-#include "SharedScoreboard.h"
 #include "../Concurrency/Lock.h"
 #include "../Services/Logger.h"
 
@@ -20,9 +19,9 @@ ScoreBoardController::~ScoreBoardController() {
 
 void ScoreBoardController::run()
 {
-char readKey;
-bool reloop = true;
-std::string message = "Press q to exit, another key to see the ScoreBoard";
+	char readKey;
+	bool reloop = true;
+	std::string message = "Press q to exit, another key to see the ScoreBoard";
 
 	do
 	{

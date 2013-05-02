@@ -8,12 +8,12 @@
 #ifndef SCOREBOARDCONTROLLER_H_
 #define SCOREBOARDCONTROLLER_H_
 
-#include "SharedScoreboard.h"
+#include "Scoreboard.h"
 
 class ScoreBoardController {
 
 private:
-	SharedScoreboard scoreBoardMemory;
+	Scoreboard scoreBoardMemory;
 
 public:
 	ScoreBoardController(int players);

@@ -11,7 +11,7 @@
 #include "../Concurrency/Fifo.h"
 #include "../Concurrency/Semaphore.h"
 #include <vector>
-#include "../Model/SharedScoreboard.h"
+#include "../Model/Scoreboard.h"
 #include "PlayerSynchronizer.h"
 #include <sys/types.h>
 
@@ -23,7 +23,7 @@ private:
 	std::vector<Semaphore> dealtSemaphores;
 	std::vector<pid_t> playerProcesses;
 	pid_t syncProcessId;
-	SharedScoreboard scoreboard;
+	Scoreboard scoreboard;
 
 	void deal(void);
 	void notifyRoundOver(int winner);

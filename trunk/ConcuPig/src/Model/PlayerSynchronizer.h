@@ -19,7 +19,6 @@ class PlayerSynchronizer : public IEventHandler {
 
 		void unblockPlayersReady(void);
 		void unblockPlayersFinished(void);
-
 	public:
 		PlayerSynchronizer(int numberOfPlayers);
 		void run(void);

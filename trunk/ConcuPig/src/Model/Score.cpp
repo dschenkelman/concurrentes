@@ -41,13 +41,24 @@ int Score::getScore(){
 }
 
 bool Score::trackLost(){
+	{
+		Lock l(this->fileName);
+		int v = this->sharedScore.getValue();
+		v++;
+		this->sharedScore.setValue(v);
+	}
+
 	int score = this->getScore();
-	score += 1;
+	bool gameOver =  score == 7;
 
-	this->setScore(score);
+	if (gameOver){
+		string message = "Score - Game Over";
+		Logger::getInstance()->logLine(message, INFO);
+	}
+	else{
+		string message = "Updated score to " + Convert::ToString(score);
+		Logger::getInstance()->logLine(message, INFO);
+	}
 
-	string message = "Setting score " + Convert::ToString(score) + " for player " + Convert::ToString(this->playerNumber);
-//	Logger::getInstance()->logLine(message, INFO);
-
-	return (score == 7);
+	return gameOver;
 }

@@ -1,26 +1,25 @@
 /*
- * SharedScoreboard.h
+ * Scoreboard.h
  *
  *  Created on: Apr 27, 2013
  *      Author: dschenkelman
  */
 
-#ifndef SHAREDSCOREBOARD_H_
-#define SHAREDSCOREBOARD_H_
+#ifndef SCOREBOARD_H_
+#define SCOREBOARD_H_
 
 #include "../Concurrency/SharedMemory.h"
 #include "../Model/Score.h"
 #include <vector>
 
-class SharedScoreboard {
+class Scoreboard {
 	std::vector<Score*> playerScores;
 	int players;
-
 public:
-	SharedScoreboard(int players, bool initializeValues);
+	Scoreboard(int players, bool initializeValues);
 	void print();
 	bool trackLost(int playerId);
-	virtual ~SharedScoreboard();
+	virtual ~Scoreboard();
 };
 
-#endif /* SHAREDSCOREBOARD_H_ */
+#endif /* SCOREBOARD_H_ */
