@@ -1,4 +1,6 @@
 #include "Semaphore.h"
+#include "../Services/Logger.h"
+#include <string>
 
 using namespace std;
 
@@ -20,6 +22,12 @@ int Semaphore :: initialize (int initialValue) {
 	semnum init;
 	init.val = initialValue;
 	int result = semctl ( this->id,0,SETVAL,init );
+
+	if (result == -1){
+		string message = "Semaphore initialize failed";
+		Logger::getInstance()->logLine(message, ERROR);
+	}
+
 	return result;
 }
 
@@ -32,6 +40,11 @@ int Semaphore :: wait () {
 	operation.sem_flg = SEM_UNDO;
 
 	int result = semop ( this->id,&operation,1 );
+
+	if (result == -1){
+		string message = "Semaphore wait failed";
+		Logger::getInstance()->logLine(message, ERROR);
+	}
 	return result;
 }
 
@@ -44,6 +57,12 @@ int Semaphore :: signal () {
 	operation.sem_flg = SEM_UNDO;
 
 	int result = semop ( this->id,&operation,1 );
+
+	if (result == -1){
+		string message = "Semaphore signal failed";
+		Logger::getInstance()->logLine(message, ERROR);
+	}
+
 	return result;
 }
 

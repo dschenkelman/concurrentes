@@ -193,13 +193,6 @@ void PlayerHead::run()
 		this->logHand();
 
 		this->playingRound = SIG_ATOMIC_TRUE;
-/*
-		if( isWinningHand() )
-		{
-			informMyHandIsOnTheTable();
-			playingRound = false;
-		}
-		*/
 
 		int playingRoundHand = 0;
 		while( playingRound == SIG_ATOMIC_TRUE)
@@ -242,14 +235,11 @@ void PlayerHead::run()
 			// state: checking if i win
 			if (isWinningHand())
 			{
-				{
-					Lock l(NamingService::getDealingFifoName(this->number));
-					if (this->playingRound == SIG_ATOMIC_TRUE){
-						this->playingRound = SIG_ATOMIC_FALSE;
-						message = "Player put down hand (winner)";
-						Logger::getInstance()->logPlayer(this->number, message, INFO);
-						this->informMyHandIsOnTheTable();
-					}
+				if (this->playingRound == SIG_ATOMIC_TRUE){
+					this->playingRound = SIG_ATOMIC_FALSE;
+					message = "Player put down hand (winner)";
+					Logger::getInstance()->logPlayer(this->number, message, INFO);
+					this->informMyHandIsOnTheTable();
 				}
 			}
 
@@ -276,7 +266,6 @@ void PlayerHead::logHand(){
 
 int PlayerHead::handleSignal (int signum){
 	if (signum == SignalNumbers::PlayerWon){
-		Lock l(NamingService::getDealingFifoName(this->number));
 		if (this->playingRound == SIG_ATOMIC_TRUE){
 			this->playingRound = SIG_ATOMIC_FALSE;
 			string message = "Player put down hand (not winner)";
