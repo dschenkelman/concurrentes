@@ -26,12 +26,18 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 	srand( time( NULL ) ^ getpid() << 16 );
-	if (argc != 2){
-		std::cout << "Usage is ConcuPig <numberOfPlayers>" << endl;
+	if (argc != 2 && argc != 3){
+		std::cout << "Usage is ConcuPig <numberOfPlayers> [-d]" << endl;
 		return 0;
 	}
 
 	int players = Convert::toInt(argv[1]);
+
+	string debug = "-d";
+
+	if (argc == 3 && debug == argv[2]){
+		Logger::enable();
+	}
 
 	string line = "Start logging";
 	Logger::getInstance()->logLine(line, INFO);
