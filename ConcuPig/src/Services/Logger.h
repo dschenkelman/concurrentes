@@ -14,11 +14,13 @@ class Logger {
 	private:
 		Logger();
 		static Logger *singletonLogger;
+		static bool enabled;
 		std::string logFile;
 		std::ofstream file;
 		time_t rawtime;
 
 	public:
+		static void enable();
 		static Logger* getInstance();
 		static void terminate();
 		void logLine(const std::string &logLine,LoggerLevels logLevel);

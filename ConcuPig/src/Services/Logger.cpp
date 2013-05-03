@@ -8,17 +8,27 @@ using namespace std;
 
 Logger* Logger::singletonLogger = NULL;
 
+bool Logger::enabled = false;
+
 Logger::Logger(){
+	if (enabled){
+		this->logFile = logFileName;
+		this->file.open (this->logFile.c_str(), ios::out | ios::app);
 
-	this->logFile = logFileName;
-	this->file.open (this->logFile.c_str(), ios::out | ios::app);
-
-	time (&this->rawtime);
-	this->file << ctime (&rawtime) << "STARTING LOGGING" << endl << flush;
+		time (&this->rawtime);
+		this->file << ctime (&rawtime) << "STARTING LOGGING" << endl << flush;
+	}
 }
 
 Logger :: ~Logger (){
-    this->file.close();
+	if (enabled){
+		this->file.close();
+	}
+}
+
+void Logger::enable()
+{
+	enabled = true;
 }
 
 Logger* Logger::getInstance()
@@ -36,12 +46,18 @@ void Logger::terminate()
 }
 
 void Logger::logPlayer(int playerNumber,const string &logLine,LoggerLevels logLevel){
+	if (!enabled){
+		return;
+	}
 	string newLogLine = "(Player: "+Convert::toString(playerNumber)+") "+logLine;
 	this->logLine(newLogLine,logLevel);
 }
 
 void Logger::logLine(const string &logLine,LoggerLevels logLevel)
 {
+	if (!enabled){
+		return;
+	}
 	time (&this->rawtime);
 
 	Lock l(this->logFile);
@@ -49,6 +65,10 @@ void Logger::logLine(const string &logLine,LoggerLevels logLevel)
 }
 
 void Logger::logLine(const char* logLine, LoggerLevels logLevel){
+	if (!enabled){
+		return;
+	}
+
 	time (&this->rawtime);
 
 	Lock l(this->logFile);
