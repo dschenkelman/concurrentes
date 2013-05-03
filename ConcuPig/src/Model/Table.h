@@ -18,6 +18,7 @@
 class Table {
 private:
 	Fifo handDownFifo;
+	Fifo playerWonFifo;
 	int numberOfPlayers;
 	std::vector<Fifo> dealingFifos;
 	std::vector<Semaphore> dealtSemaphores;
@@ -27,8 +28,9 @@ private:
 
 	void deal(void);
 	void notifyRoundOver(int winner);
-	void notifyGameOver();
+	void notifyGameOver(void);
 	void unblockPlayers(void);
+	int checkForLoser(void);
 public:
 	Table(int numberOfPlayers, int syncProcess, std::vector<int>& playerProcesses);
 	void run(void);
