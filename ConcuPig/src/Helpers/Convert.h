@@ -13,7 +13,7 @@
 class Convert {
 public:
 	static std::string toString(int number);
-	static int ToInt(char* value);
+	static int toInt(char* value);
 };
 
 #endif /* CONVERT_H_ */

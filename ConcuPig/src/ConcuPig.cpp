@@ -26,14 +26,12 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 	srand( time( NULL ) ^ getpid() << 16 );
-//	if (argc != 2){
-//		std::cout << "Usage is ConcuPig <numberOfPlayers>" << endl;
-//		return 0;
-//	}
-//
-//	 int players = Convert::ToInt(argv[1]);
+	if (argc != 2){
+		std::cout << "Usage is ConcuPig <numberOfPlayers>" << endl;
+		return 0;
+	}
 
-	int players = 4;
+	int players = Convert::toInt(argv[1]);
 
 	string line = "Start logging";
 	Logger::getInstance()->logLine(line, INFO);
@@ -60,6 +58,7 @@ int main(int argc, char* argv[]) {
 			if (receiverId == 0){
 				PlayerCardReceiver receiver(startedPlayers, startedPlayers == 0 ? players - 1 : startedPlayers - 1);
 				receiver.run();
+				Logger::terminate();
 				return 0;
 			}
 			else{
@@ -70,6 +69,7 @@ int main(int argc, char* argv[]) {
 				if (senderId == 0){
 					PlayerCardSender sender(startedPlayers, (startedPlayers + 1) % players);
 					sender.run();
+					Logger::terminate();
 					return 0;
 				}
 				else{
@@ -81,6 +81,7 @@ int main(int argc, char* argv[]) {
 					message = "About to start running player " + Convert::toString(startedPlayers);
 					Logger::getInstance()->logLine(message, INFO);
 					player.run();
+					Logger::terminate();
 					return 0;
 				}
 			}
@@ -114,6 +115,8 @@ int main(int argc, char* argv[]) {
 			cout << "Game over" << endl;
 		}
 	}
+
+	Logger::terminate();
 
 	return 0;
 }

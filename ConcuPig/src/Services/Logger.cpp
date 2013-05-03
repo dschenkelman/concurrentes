@@ -23,10 +23,16 @@ Logger :: ~Logger (){
 
 Logger* Logger::getInstance()
 {
-	if ( singletonLogger == NULL )
+	if (singletonLogger == NULL)
 		singletonLogger = new Logger();
 
 	return singletonLogger;
+}
+
+void Logger::terminate()
+{
+	if ( singletonLogger == NULL )
+		delete singletonLogger;
 }
 
 void Logger::logPlayer(int playerNumber,const string &logLine,LoggerLevels logLevel){
