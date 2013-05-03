@@ -25,15 +25,13 @@ private:
 				senderSemaphore,
 				receivedSemaphore,
 				sentSemaphore,
-				dealtSemaphore,
-				everyBodyPickUpCardSemaphore;
+				dealtSemaphore;
 	SharedCard cardToSendMemory, receivedCardMemory;
-	Fifo playerReadyFifo, playersEverybodyPickUpCardFifo, handDownFifo, dealtFifo;
+	Fifo playerReadyFifo, handDownFifo, dealtFifo;
 
 	void createSubProcess();
 	void informCardHasBeenSelected();
 	void informMyHandIsOnTheTable();
-	void informCardHasBeenPicked();
 	Card retrieveCardToSend();
 	void logHand();
 public:

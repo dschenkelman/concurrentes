@@ -33,8 +33,8 @@ string NamingService::getPlayersReadyFifoName(){
 	return FifoNames::PlayersReady;
 }
 
-string NamingService::getPlayersEverybodyPickUpCardFifoName(){
-	return FifoNames::PlayersEverybodyPickUpCard;
+string NamingService::getPlayerWonFifoName(){
+	return FifoNames::PlayerWon;
 }
 
 key_t NamingService::getSharedCardKey(const std::string& cardType, int playerNumber){
@@ -63,5 +63,3 @@ key_t NamingService::getSharedScoreKey(int player){
 string NamingService::getSharedScoreFileName(int player){
 	return SharedMemoryNames::Score + Convert::ToString(player);
 }
-
-
