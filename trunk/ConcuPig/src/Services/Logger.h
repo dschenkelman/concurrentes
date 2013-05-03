@@ -20,6 +20,7 @@ class Logger {
 
 	public:
 		static Logger* getInstance();
+		static void terminate();
 		void logLine(const std::string &logLine,LoggerLevels logLevel);
 		void logLine(const char* logLine, LoggerLevels logLevel);
 		void logPlayer(int playerNumber,const std::string &logLine,LoggerLevels logLevel);

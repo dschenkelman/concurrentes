@@ -17,7 +17,7 @@ string Convert::toString(int number){
 	return convert.str();
 }
 
-int Convert::ToInt(char* value){
+int Convert::toInt(char* value){
 	string str(value);
 
 	int number;
