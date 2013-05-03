@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 				return 0;
 			}
 			else{
-				message = "Receiver process for player " + Convert::ToString(startedPlayers) + " is:" + Convert::ToString(receiverId);
+				message = "Receiver process for player " + Convert::toString(startedPlayers) + " is:" + Convert::toString(receiverId);
 				Logger::getInstance()->logLine(message, INFO);
 
 				pid_t senderId = fork();
@@ -73,12 +73,12 @@ int main(int argc, char* argv[]) {
 					return 0;
 				}
 				else{
-					message = "Sender process for player " + Convert::ToString(startedPlayers) + " is:" + Convert::ToString(senderId);
+					message = "Sender process for player " + Convert::toString(startedPlayers) + " is:" + Convert::toString(senderId);
 					Logger::getInstance()->logLine(message, INFO);
 
 					srand( time( NULL ) ^ getpid() << 16 );
 					PlayerHead player(startedPlayers, receiverId, senderId);
-					message = "About to start running player " + Convert::ToString(startedPlayers);
+					message = "About to start running player " + Convert::toString(startedPlayers);
 					Logger::getInstance()->logLine(message, INFO);
 					player.run();
 					return 0;
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 		else{
-			message = "Head process for player " + Convert::ToString(startedPlayers) + " is:" + Convert::ToString(childProcess);
+			message = "Head process for player " + Convert::toString(startedPlayers) + " is:" + Convert::toString(childProcess);
 			Logger::getInstance()->logLine(message, INFO);
 			playerProcesses.push_back(childProcess);
 			startedPlayers++;

@@ -24,7 +24,7 @@ Scoreboard::Scoreboard(int players, bool initializeValues){
 void Scoreboard::print(){
 	for (int i = 0; i < this->players; i++) {
 		int score = this->playerScores[i]->getScore();
-		cout << "Player " << Convert::ToString(i) << " score: " << Convert::ToString(score) << endl;
+		cout << "Player " << Convert::toString(i) << " score: " << Convert::toString(score) << endl;
 	}
 }
 

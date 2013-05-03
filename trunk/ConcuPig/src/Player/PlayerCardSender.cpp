@@ -43,8 +43,8 @@ void PlayerCardSender::run(){
 		memset(cardToSend, 0, 2);
 		this->sharedCard.serialize(cardToSend);
 
-		logLine = "Writing on FIFO "+this->fifoName+" from Player: "+Convert::ToString(this->playerNumber)+" to: Player: "+
-				Convert::ToString(this->playerTarget);
+		logLine = "Writing on FIFO "+this->fifoName+" from Player: "+Convert::toString(this->playerNumber)+" to: Player: "+
+				Convert::toString(this->playerTarget);
 		logger->logPlayer(this->playerNumber, logLine,INFO);
 		this->fifo.writeValue(cardToSend, sizeof(char) * 2);
 

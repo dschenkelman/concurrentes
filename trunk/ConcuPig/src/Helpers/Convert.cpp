@@ -11,7 +11,7 @@
 
 using namespace std;
 
-string Convert::ToString(int number){
+string Convert::toString(int number){
 	ostringstream convert;
 	convert << number;
 	return convert.str();

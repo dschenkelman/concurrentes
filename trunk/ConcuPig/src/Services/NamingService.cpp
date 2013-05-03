@@ -18,11 +18,11 @@ key_t NamingService::getSemaphoreKey(const std::string& kind, int playerNumber){
 }
 
 string NamingService::getCardPassingFifoFileName(int originPlayer, int targetPlayer){
-	return FifoNames::CardPassing + "_" + Convert::ToString(originPlayer) + "_" + Convert::ToString(targetPlayer);
+	return FifoNames::CardPassing + "_" + Convert::toString(originPlayer) + "_" + Convert::toString(targetPlayer);
 }
 
 string NamingService::getDealingFifoName(int player){
-	return FifoNames::Dealing + Convert::ToString(player);
+	return FifoNames::Dealing + Convert::toString(player);
 }
 
 string NamingService::getHandDownFifoName(){
@@ -42,7 +42,7 @@ key_t NamingService::getSharedCardKey(const std::string& cardType, int playerNum
 }
 
 string NamingService::getSharedCardFileName(const std::string& cardType, int playerNumber){
-	string fileName = cardType.c_str() + Convert::ToString(playerNumber);
+	string fileName = cardType.c_str() + Convert::toString(playerNumber);
 	return fileName;
 }
 
@@ -61,5 +61,5 @@ key_t NamingService::getSharedScoreKey(int player){
 }
 
 string NamingService::getSharedScoreFileName(int player){
-	return SharedMemoryNames::Score + Convert::ToString(player);
+	return SharedMemoryNames::Score + Convert::toString(player);
 }

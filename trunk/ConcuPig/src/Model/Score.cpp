@@ -56,7 +56,7 @@ bool Score::trackLost(){
 		Logger::getInstance()->logLine(message, INFO);
 	}
 	else{
-		string message = "Updated score to " + Convert::ToString(score);
+		string message = "Updated score to " + Convert::toString(score);
 		Logger::getInstance()->logLine(message, INFO);
 	}
 
