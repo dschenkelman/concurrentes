@@ -36,7 +36,6 @@ scoreboard(numberOfPlayers, false){
 void Table::run(){
 	string message = "Table starting";
 	Logger::getInstance()-> logLine(message, INFO);
-	bool gameOver = false;
 	int loserId = -1;
 	do {
 		this->deal();
@@ -44,7 +43,7 @@ void Table::run(){
 
 		do{
 			loserId = this->checkForLoser();
-		} while(loserId != -1);
+		} while(loserId == -1);
 
 	} while(!this->scoreboard.trackLost(loserId));
 
@@ -70,7 +69,7 @@ int Table::checkForLoser(void){
 
 		if (playerId != -1){
 			handsDown++;
-			message = "Player put hand down: " + Convert::ToString(playerId);
+			message = "Player put hand down: " + Convert::toString(playerId);
 			Logger::getInstance()-> logLine(message, INFO);
 		}
 
@@ -94,11 +93,11 @@ int Table::checkForLoser(void){
 			this->handDownFifo.readValue(id, sizeof(char) * 4);
 			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
 			handsDown++;
-			message = "Player put hand down: " + Convert::ToString(playerId);
+			message = "Player put hand down: " + Convert::toString(playerId);
 			Logger::getInstance()-> logLine(message, INFO);
 		}
 
-		message = "Table - Round Finished.  Player that lost: " + Convert::ToString(playerId);
+		message = "Table - Round Finished.  Player that lost: " + Convert::toString(playerId);
 		Logger::getInstance()-> logLine(message, INFO);
 
 		return playerId;
@@ -118,10 +117,10 @@ void Table::deal(){
 		char c[2];
 		memset(c, 0, 2);
 		card.serialize(c);
-		string m = "Dealing card " + Convert::ToString(i);
+		string m = "Dealing card " + Convert::toString(i);
 		Logger::getInstance()-> logLine(m, INFO);
 		int result = this->dealingFifos[i % this->numberOfPlayers].writeValue(c, sizeof(char) * 2);
-		m = "Dealing FIFO result " + Convert::ToString(result);
+		m = "Dealing FIFO result " + Convert::toString(result);
 		Logger::getInstance()-> logLine(m, INFO);
 		i++;
 	}
@@ -131,7 +130,7 @@ void Table::deal(){
 
 void Table::unblockPlayers(void){
 	for (unsigned int i = 0; i < this->dealtSemaphores.size(); i++) {
-		string s = "Signaling semaphore " + Convert::ToString(i);
+		string s = "Signaling semaphore " + Convert::toString(i);
 		Logger::getInstance()-> logLine(s, INFO);
 		this->dealtSemaphores[i].signal();
 	}
@@ -140,7 +139,7 @@ void Table::unblockPlayers(void){
 void Table::notifyGameOver(){
 	string message;
 	for (int i = 0; i < this->playerProcesses.size(); ++i) {
-		message = "Notifying game over to player - " + Convert::ToString(i);
+		message = "Notifying game over to player - " + Convert::toString(i);
 		Logger::getInstance()-> logLine(message, INFO);
 		kill(this->playerProcesses[i], SignalNumbers::GameOver);
 	}

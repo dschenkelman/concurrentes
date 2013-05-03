@@ -14,7 +14,7 @@
 class PlayerHead : public IEventHandler {
 
 private:
-	sig_atomic_t playingRound;
+	bool playingRound;
 	sig_atomic_t gameOver;
 	pid_t receiverProcessId;
 	pid_t senderProcessId;
@@ -27,11 +27,13 @@ private:
 				sentSemaphore,
 				dealtSemaphore;
 	SharedCard cardToSendMemory, receivedCardMemory;
-	Fifo playerReadyFifo, handDownFifo, dealtFifo;
+	Fifo playerReadyFifo, handDownFifo, dealtFifo, playerWonFifo;
 
 	void createSubProcess();
 	void informCardHasBeenSelected();
 	void informMyHandIsOnTheTable();
+	void informHandIsNotOnTable();
+	bool checkIfSomeoneWon();
 	Card retrieveCardToSend();
 	void logHand();
 public:

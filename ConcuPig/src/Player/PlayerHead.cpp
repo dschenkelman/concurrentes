@@ -38,7 +38,8 @@ number(playerNumber),
 	receivedCardMemory(SharedMemoryNames::CardToReceive, playerNumber),
 	playerReadyFifo(NamingService::getPlayersReadyFifoName()),
 	handDownFifo(NamingService::getHandDownFifoName()),
-	dealtFifo(NamingService::getDealingFifoName(playerNumber))
+	dealtFifo(NamingService::getDealingFifoName(playerNumber)),
+	playerWonFifo(NamingService::getPlayerWonFifoName())
 {
 	SignalHandler::getInstance()->registerHandler(SignalNumbers::GameOver, this);
 }
@@ -131,6 +132,21 @@ void PlayerHead::informMyHandIsOnTheTable()
 	this->handDownFifo.writeValue(n, sizeof(char) * 4);
 }
 
+void PlayerHead::informHandIsNotOnTable()
+{
+	char n[4];
+	memset(n, 0, 4);
+	n[0] = -1;
+	n[1] = 0;
+	n[2] = 0;
+	n[3] = 0;
+
+	std::string message = "handDownFifo.writeValue";
+	Logger::getInstance()->logPlayer(this->number, message, INFO);
+
+	this->handDownFifo.writeValue(n, sizeof(char) * 4);
+}
+
 bool PlayerHead::isWinningHand()
 {
 	return
@@ -179,7 +195,7 @@ void PlayerHead::run()
 		int playingRoundHand = 0;
 		while( playingRound == SIG_ATOMIC_TRUE)
 		{
-			message = "Playing round = " + Convert::ToString(playingRoundHand);
+			message = "Playing round = " + Convert::toString(playingRoundHand);
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 			playingRoundHand++;
 
@@ -187,7 +203,7 @@ void PlayerHead::run()
 
 			// state : preparing to play a round
 			Card cardToSend = retrieveCardToSend();
-			message = "Card retrieved " + cardToSend.toString() + "     round,hand " + Convert::ToString(playingGameRound) + ","+ Convert::ToString(playingRoundHand);
+			message = "Card retrieved " + cardToSend.toString() + "     round,hand " + Convert::toString(playingGameRound) + ","+ Convert::toString(playingRoundHand);
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 
 			informCardHasBeenSelected();
@@ -215,14 +231,25 @@ void PlayerHead::run()
 			Logger::getInstance()->logPlayer(this->number, message, INFO);
 
 			// state: checking if i win
-			if (isWinningHand())
+			bool iWon = this->isWinningHand();
+			if (iWon)
 			{
-				if (this->playingRound == SIG_ATOMIC_TRUE){
-					this->playingRound = SIG_ATOMIC_FALSE;
-					message = "Player put down hand (winner)";
-					Logger::getInstance()->logPlayer(this->number, message, INFO);
-					this->informMyHandIsOnTheTable();
-				}
+				this->playingRound = false;
+				message = "Player put down hand (winner)";
+				Logger::getInstance()->logPlayer(this->number, message, INFO);
+				this->informMyHandIsOnTheTable();
+			}
+			else{
+				this->informHandIsNotOnTable();
+			}
+
+			bool someOneWon = this->checkIfSomeoneWon();
+
+			if (someOneWon && !iWon){
+				this->playingRound = false;
+				message = "Player put down hand (not winner)";
+				Logger::getInstance()->logPlayer(this->number, message, INFO);
+				this->informMyHandIsOnTheTable();
 			}
 		}
 		playingGameRound++;
@@ -239,6 +266,13 @@ void PlayerHead::logHand(){
 		message += this->hand[i].toString() + " | ";
 	}
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
+}
+
+bool PlayerHead::checkIfSomeoneWon(){
+	char value[1];
+	this->playerWonFifo.readValue(value, sizeof(char));
+
+	return value[0] == 1;
 }
 
 int PlayerHead::handleSignal (int signum){

@@ -40,8 +40,8 @@ void PlayerCardReceiver::run(){
 
 		char cardReceived [2];
 		memset(cardReceived, 0, 2);
-		logLine = "Reading from FIFO "+this->fifoName+". Sent by Player: "+Convert::ToString(this->playerOrigin)+" to: Player: "+
-						Convert::ToString(this->playerNumber);
+		logLine = "Reading from FIFO "+this->fifoName+". Sent by Player: "+Convert::toString(this->playerOrigin)+" to: Player: "+
+						Convert::toString(this->playerNumber);
 		logger->logPlayer(this->playerNumber, logLine, INFO);
 		this->fifo.readValue(cardReceived, sizeof(char) * 2);
 

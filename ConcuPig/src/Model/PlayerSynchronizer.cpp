@@ -43,10 +43,10 @@ void PlayerSynchronizer::run(){
 
 			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
 
-			line = "Sync - Player Id ready in Sync: " + Convert::ToString(playerId);
+			line = "Sync - Player Id ready in Sync: " + Convert::toString(playerId);
 			Logger::getInstance()->logLine(line, INFO);
 			playersReady++;
-			line = "Sync - Players Ready: " + Convert::ToString(playersReady);
+			line = "Sync - Players Ready: " + Convert::toString(playersReady);
 			Logger::getInstance()->logLine(line, INFO);
 		}
 
@@ -59,7 +59,7 @@ void PlayerSynchronizer::run(){
 
 void PlayerSynchronizer::unblockPlayersReady(void){
 	for (unsigned int i = 0; i < this->playersReadySemaphores.size(); i++) {
-		string line = "Sync - Unblocked player readying " + Convert::ToString(i);
+		string line = "Sync - Unblocked player readying " + Convert::toString(i);
 		Logger::getInstance()->logLine(line, INFO);
 		this->playersReadySemaphores[i].signal();
 	}

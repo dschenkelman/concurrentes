@@ -1,6 +1,8 @@
 #include "Semaphore.h"
 #include "../Services/Logger.h"
 #include <string>
+#include <errno.h>
+#include "../Helpers/Convert.h"
 
 using namespace std;
 
@@ -39,10 +41,11 @@ int Semaphore :: wait () {
 	operation.sem_op  = -1;	// Decrease by one the semaphore
 	operation.sem_flg = SEM_UNDO;
 
-	int result = semop ( this->id,&operation,1 );
+	int result = semop ( this->id,&operation, 1);
 
 	if (result == -1){
-		string message = "Semaphore wait failed";
+		int e = errno;
+		string message = "Semaphore wait failed:" + Convert::toString(e);
 		Logger::getInstance()->logLine(message, ERROR);
 	}
 	return result;
@@ -56,10 +59,11 @@ int Semaphore :: signal () {
 	operation.sem_op  = 1;	// Increase by one the semaphore
 	operation.sem_flg = SEM_UNDO;
 
-	int result = semop ( this->id,&operation,1 );
+	int result = semop (this->id, &operation, 1);
 
 	if (result == -1){
-		string message = "Semaphore signal failed";
+		int e = errno;
+		string message = "Semaphore signal failed:" + Convert::toString(e);
 		Logger::getInstance()->logLine(message, ERROR);
 	}
 
@@ -67,5 +71,7 @@ int Semaphore :: signal () {
 }
 
 void Semaphore :: eliminate () {
+	string message = "Semaphore eliminated";
+	Logger::getInstance()->logLine(message, WARNING);
 	semctl ( this->id,0,IPC_RMID );
 }

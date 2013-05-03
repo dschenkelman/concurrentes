@@ -30,7 +30,7 @@ Logger* Logger::getInstance()
 }
 
 void Logger::logPlayer(int playerNumber,const string &logLine,LoggerLevels logLevel){
-	string newLogLine = "(Player: "+Convert::ToString(playerNumber)+") "+logLine;
+	string newLogLine = "(Player: "+Convert::toString(playerNumber)+") "+logLine;
 	this->logLine(newLogLine,logLevel);
 }
 
