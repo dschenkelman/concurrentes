@@ -40,7 +40,6 @@ number(playerNumber),
 	handDownFifo(NamingService::getHandDownFifoName()),
 	dealtFifo(NamingService::getDealingFifoName(playerNumber))
 {
-	SignalHandler::getInstance()->registerHandler(SignalNumbers::PlayerWon, this);
 	SignalHandler::getInstance()->registerHandler(SignalNumbers::GameOver, this);
 }
 
@@ -243,15 +242,7 @@ void PlayerHead::logHand(){
 }
 
 int PlayerHead::handleSignal (int signum){
-	if (signum == SignalNumbers::PlayerWon){
-		if (this->playingRound == SIG_ATOMIC_TRUE){
-			this->playingRound = SIG_ATOMIC_FALSE;
-			string message = "Player put down hand (not winner)";
-			Logger::getInstance()->logPlayer(this->number, message, INFO);
-			informMyHandIsOnTheTable();
-		}
-	}
-	else if (signum == SignalNumbers::GameOver){
+	if (signum == SignalNumbers::GameOver){
 		kill(this->receiverProcessId, SignalNumbers::GameOver);
 		kill(this->senderProcessId, SignalNumbers::GameOver);
 		this->gameOver = SIG_ATOMIC_TRUE;

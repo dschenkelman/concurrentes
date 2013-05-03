@@ -20,6 +20,7 @@ using namespace std;
 
 Table::Table(int numberOfPlayers, int syncProcess, std::vector<pid_t>& playerProcesses) :
 handDownFifo(NamingService::getHandDownFifoName()),
+playerWonFifo(NamingService::getPlayerWonFifoName()),
 numberOfPlayers(numberOfPlayers),
 playerProcesses(playerProcesses),
 syncProcessId(syncProcess),
@@ -33,40 +34,77 @@ scoreboard(numberOfPlayers, false){
 }
 
 void Table::run(){
-	int playerId = -1;
-
 	string message = "Table starting";
 	Logger::getInstance()-> logLine(message, INFO);
+	bool gameOver = false;
+	int loserId = -1;
 	do {
 		this->deal();
 		this->unblockPlayers();
-		int handPutDown = 0;
-		while(handPutDown != this->numberOfPlayers){
-			message = "Waiting for player to finish";
-			Logger::getInstance()-> logLine(message, INFO);
 
-			char id[4];
-			memset(id, 0, 4);
-			this->handDownFifo.readValue(id, sizeof(char) * 4);
-			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
+		do{
+			loserId = this->checkForLoser();
+		} while(loserId != -1);
 
-			handPutDown++;
-			message = "Player put hand down: " + Convert::ToString(playerId) + ". Total: " + Convert::ToString(handPutDown);
-			Logger::getInstance()-> logLine(message, INFO);
-
-			if (handPutDown == 1){
-				this->notifyRoundOver(playerId);
-			}
-		}
-
-		message = "Table - Round Finished.  Player that lost: " + Convert::ToString(playerId);
-		Logger::getInstance()-> logLine(message, INFO);
-	} while(!this->scoreboard.trackLost(playerId));
+	} while(!this->scoreboard.trackLost(loserId));
 
 	message = "Table - GAME OVER";
 	Logger::getInstance()-> logLine(message, INFO);
 
 	this->notifyGameOver();
+}
+
+int Table::checkForLoser(void){
+	string message;
+	int decidedOnHandDown = 0;
+	int playerId = -1;
+	int handsDown = 0;
+	while(decidedOnHandDown != this->numberOfPlayers){
+		message = "Waiting for player to decide if won";
+		Logger::getInstance()-> logLine(message, INFO);
+
+		char id[4];
+		memset(id, 0, 4);
+		this->handDownFifo.readValue(id, sizeof(char) * 4);
+		playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
+
+		if (playerId != -1){
+			handsDown++;
+			message = "Player put hand down: " + Convert::ToString(playerId);
+			Logger::getInstance()-> logLine(message, INFO);
+		}
+
+		decidedOnHandDown++;
+	}
+
+	for (int i = 0; i < this->numberOfPlayers; i++){
+		char valueToWrite[1];
+		valueToWrite[0] = 0;
+		if (handsDown != 0){
+			valueToWrite[0] = 1;
+		}
+
+		this->playerWonFifo.writeValue(valueToWrite, sizeof(char));
+	}
+
+	if (handsDown != 0){
+		while (handsDown != this->numberOfPlayers){
+			char id[4];
+			memset(id, 0, 4);
+			this->handDownFifo.readValue(id, sizeof(char) * 4);
+			playerId = id[0] + (id[1] << 8) + (id[2] << 16) + (id[3] << 24);
+			handsDown++;
+			message = "Player put hand down: " + Convert::ToString(playerId);
+			Logger::getInstance()-> logLine(message, INFO);
+		}
+
+		message = "Table - Round Finished.  Player that lost: " + Convert::ToString(playerId);
+		Logger::getInstance()-> logLine(message, INFO);
+
+		return playerId;
+	}
+
+	return -1;
 }
 
 void Table::deal(){
@@ -96,16 +134,6 @@ void Table::unblockPlayers(void){
 		string s = "Signaling semaphore " + Convert::ToString(i);
 		Logger::getInstance()-> logLine(s, INFO);
 		this->dealtSemaphores[i].signal();
-	}
-}
-
-void Table::notifyRoundOver(int winner){
-	for (int i = 0; i < this->playerProcesses.size(); ++i) {
-		if (i != winner){
-			string message = "Notifying round over to player - " + Convert::ToString(i);
-			Logger::getInstance()-> logLine(message, INFO);
-			kill(this->playerProcesses[i], SignalNumbers::PlayerWon);
-		}
 	}
 }
 
