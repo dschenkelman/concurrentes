@@ -16,7 +16,7 @@ public:
 	static const std::string Dealing;
 	static const std::string HandDown;
 	static const std::string PlayersReady;
-	static const std::string PlayersEverybodyPickUpCard;
+	static const std::string PlayerWon;
 };
 
 #endif /* FIFONAMES_H_ */

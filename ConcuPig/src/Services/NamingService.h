@@ -18,7 +18,7 @@ public:
 	static std::string getDealingFifoName(int player);
 	static std::string getHandDownFifoName();
 	static std::string getPlayersReadyFifoName();
-	static std::string getPlayersEverybodyPickUpCardFifoName();
+	static std::string getPlayerWonFifoName();
 	static key_t getSharedCardKey(const std::string& cardType, int playerNumber);
 	static std::string getSharedCardFileName(const std::string& cardType, int playerNumber);
 	static key_t getScoreboardKey();
