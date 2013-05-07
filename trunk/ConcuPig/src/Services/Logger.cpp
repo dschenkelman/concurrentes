@@ -10,10 +10,12 @@ Logger* Logger::singletonLogger = NULL;
 
 bool Logger::enabled = false;
 
+const string Logger::logFile = "LOG";
+
 Logger::Logger(){
 	if (enabled){
-		this->logFile = logFileName;
-		this->file.open (this->logFile.c_str(), ios::out | ios::app);
+
+		this->file.open (Logger::logFile.c_str(), ios::out | ios::app);
 
 		time (&this->rawtime);
 		this->file << ctime (&rawtime) << "STARTING LOGGING" << endl << flush;

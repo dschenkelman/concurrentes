@@ -15,7 +15,7 @@ class Logger {
 		Logger();
 		static Logger *singletonLogger;
 		static bool enabled;
-		std::string logFile;
+		static const std::string logFile;
 		std::ofstream file;
 		time_t rawtime;
 
