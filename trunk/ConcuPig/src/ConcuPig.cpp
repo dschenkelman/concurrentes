@@ -87,6 +87,7 @@ int main(int argc, char* argv[]) {
 					message = "About to start running player " + Convert::toString(startedPlayers);
 					Logger::getInstance()->logLine(message, INFO);
 					player.run();
+					player.~PlayerHead();
 					Logger::terminate();
 					return 0;
 				}
@@ -118,6 +119,8 @@ int main(int argc, char* argv[]) {
 			scoreboard.print();
 
 			manager.terminate();
+			scoreboard.~Scoreboard();
+
 			cout << "Game over" << endl;
 		}
 	}

@@ -26,6 +26,7 @@ private:
 	void openFifo(const std::string& name);
 	void terminateSemaphores(key_t key, int initialValue);
 	void createFile(const std::string& fileName);
+	void deleteFile(const std::string& fileName);
 public:
 	ConcurrencyManager(int players);
 	void initialize(void);

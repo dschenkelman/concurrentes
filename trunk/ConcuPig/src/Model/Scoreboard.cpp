@@ -33,7 +33,7 @@ bool Scoreboard::trackLost(int playerId){
 }
 
 Scoreboard::~Scoreboard() {
-	for (int i = 0; i < this->playerScores.size(); i++) {
-		delete this->playerScores[i];
+	for (unsigned int i = 0; i < this->playerScores.size(); i++) {
+		this->playerScores[i]->~Score();
 	}
 }

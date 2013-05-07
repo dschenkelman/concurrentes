@@ -23,10 +23,14 @@ Score::Score (int playerNumber, bool initializeValue) : playerNumber(playerNumbe
 }
 
 Score::~Score(){
-	Lock l(this->fileName);
-	string message = "Score - Destroying";
-	Logger::getInstance()->logLine(message, INFO);
-	this->sharedScore.release();
+
+	{
+		Lock l(this->fileName);
+		string message = "Score - Destroying";
+		Logger::getInstance()->logLine(message, INFO);
+		this->sharedScore.release();
+	}
+	remove(this->fileName.c_str());
 }
 
 

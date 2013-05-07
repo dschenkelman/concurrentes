@@ -138,7 +138,7 @@ void Table::unblockPlayers(void){
 
 void Table::notifyGameOver(){
 	string message;
-	for (int i = 0; i < this->playerProcesses.size(); ++i) {
+	for (unsigned int i = 0; i < this->playerProcesses.size(); ++i) {
 		message = "Notifying game over to player - " + Convert::toString(i);
 		Logger::getInstance()-> logLine(message, INFO);
 		kill(this->playerProcesses[i], SignalNumbers::GameOver);
