@@ -94,12 +94,33 @@ void ConcurrencyManager::terminate(){
 		this->fifos[i].eliminate();
 	}
 
+	for (int i = 0; i < this->players; i++){
+		string receiveCardName = NamingService::getSharedCardFileName(SharedMemoryNames::CardToReceive, i);
+		string sendCardName = NamingService::getSharedCardFileName(SharedMemoryNames::CardToSend, i);
+
+		this->deleteFile(receiveCardName);
+		this->deleteFile(sendCardName);
+	}
+
+	this->deleteFile(NamingService::getScoreboardFileName());
+
+	this->deleteFile(SemaphoreNames::DealtSemaphore);
+	this->deleteFile(SemaphoreNames::ReadyToSendReceive);
+	this->deleteFile(SemaphoreNames::ReceivedSemaphore);
+	this->deleteFile(SemaphoreNames::ReceiverSemaphore);
+	this->deleteFile(SemaphoreNames::SenderSemaphore);
+	this->deleteFile(SemaphoreNames::SentSemaphore);
 }
+
 
 void ConcurrencyManager::createFile(const string& fileName){
 	std::ofstream stream;
 	stream.open(fileName.c_str(), ios::out | ios::app);
 	stream.close();
+}
+
+void ConcurrencyManager::deleteFile(const string& fileName){
+	remove(fileName.c_str());
 }
 
 ConcurrencyManager::~ConcurrencyManager() {

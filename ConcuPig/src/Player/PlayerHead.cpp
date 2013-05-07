@@ -292,4 +292,6 @@ int PlayerHead::handleSignal (int signum){
 PlayerHead::~PlayerHead() {
 	string message = "Head - Destroying";
 	Logger::getInstance()->logPlayer(this->number, message, INFO);
+	this->cardToSendMemory.~SharedCard();
+	this->receivedCardMemory.~SharedCard();
 }
