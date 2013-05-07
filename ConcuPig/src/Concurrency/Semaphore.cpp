@@ -73,5 +73,5 @@ int Semaphore :: signal () {
 void Semaphore :: eliminate () {
 	string message = "Semaphore eliminated";
 	Logger::getInstance()->logLine(message, WARNING);
-	semctl ( this->id,0,IPC_RMID );
+	semctl ( this->id,0,IPC_RMID, NULL);
 }
