@@ -2,7 +2,7 @@
 
 #include <unistd.h>
 
-#define	logFileName	"logFileTMP"
+#define	logFileName	"LOG"
 
 using namespace std;
 
