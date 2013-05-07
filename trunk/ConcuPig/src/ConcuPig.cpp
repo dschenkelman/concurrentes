@@ -116,8 +116,6 @@ int main(int argc, char* argv[]) {
 			ScoreBoardController controller(players);
 			controller.run();
 
-			scoreboard.print();
-
 			manager.terminate();
 			scoreboard.~Scoreboard();
 
