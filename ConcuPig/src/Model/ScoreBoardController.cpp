@@ -35,5 +35,8 @@ void ScoreBoardController::run()
 			this->scoreBoardMemory.print();
 		}
 	}while( reloop );
+
+	// Final scoreboard
+	this->scoreBoardMemory.print();
 }
 
