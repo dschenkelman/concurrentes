@@ -42,6 +42,7 @@ protected:
 private:
 	std::list<struct person> persons;
 	static DataBaseManager *instance;
+	static const std::string dbFile;
 };
 
 #endif /* DATABASEMANAGER_H_ */
