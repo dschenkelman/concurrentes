@@ -37,7 +37,7 @@ bool DataBaseManager::initialize()
 		return false;
 	}
 
-    while (fscanf(fd, "%61[^;];%120[^;];%13[^;]",name,address,telephone) == 3){
+    while (fscanf(fd, "%61[^;];%120[^;];%s\n",name,address,telephone) == 3){
     	person pAux;
     	strcpy(pAux.name,name);
     	strcpy(pAux.address,address);
@@ -48,25 +48,9 @@ bool DataBaseManager::initialize()
 
     fclose(fd);
 
-    /*
-	struct person matias;
-	strcpy(matias.name, "Matias Servetto");
-	strcpy(matias.address, "Ecuador 871");
-	strcpy(matias.telephone, "1170707070");
-	persons.push_back(matias);
-
-	struct person sebastian;
-	strcpy(sebastian.name, "Sebastian Rodriguez");
-	strcpy(sebastian.address, "Ugarte y Maipu");
-	strcpy(sebastian.telephone, "1160606060");
-	persons.push_back(sebastian);
-
-	struct person damian;
-	strcpy(damian.name, "Damian Schenkelman");
-	strcpy(damian.address, "Caballito");
-	strcpy(damian.telephone, "1150505050");
-	persons.push_back(damian);
-	*/
+    for (list<struct person>::iterator it = persons.begin(); it != persons.end(); it++){
+    	cout << it->name << ";" << it->address << ";" << it->telephone << endl;
+    }
 
 	return true;
 }
