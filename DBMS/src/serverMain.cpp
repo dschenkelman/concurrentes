@@ -1,4 +1,4 @@
-#ifdef MAIN_SERVER
+//#ifdef MAIN_SERVER
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -140,8 +140,8 @@ bool createMessageQueues()
 	stream.open(ASSET_RESPONSE_FILE, ios::out | ios::app);
 	stream.close();
 
-	mqRequest = new MessageQueue<struct messageRequest>(ASSET_REQUEST_FILE, 'a');
-	mqResponse = new MessageQueue<struct messageResponse>(ASSET_RESPONSE_FILE, 'a');
+	mqRequest = new MessageQueue<struct messageRequest>(ASSET_REQUEST_FILE);
+	mqResponse = new MessageQueue<struct messageResponse>(ASSET_RESPONSE_FILE);
 
 	return NULL == mqRequest || NULL == mqResponse;
 }
@@ -166,39 +166,110 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	std::list<struct messageResponse> r;
 	struct person newPerson;
 	strcpy(newPerson.name, request.name);
-	strcpy(newPerson.direction, request.direction);
+	strcpy(newPerson.address, request.address);
 	strcpy(newPerson.telephone, request.telephone);
 
-	switch(request.petitionActionType)
+	switch(request.requestActionType)
 	{
 	case CREATE:
 	{
-		// TODO create head
-		DataBaseManager::getInstance()->createPerson(newPerson);
+		bool success;
+		int messageType;
+
+		success = DataBaseManager::getInstance()->createPerson(newPerson);
+		messageType = true == success ? OPERATION_CREATE_SUCCESS : OPERATION_FAILED;
+
+		struct messageResponse head;
+		head.clientId = request.clientId;
+		head.responseActionType = messageType;
+		head.numberOfRegisters = 0;
+		strcpy(head.name, newPerson.name);
+		strcpy(head.address, newPerson.address);
+		strcpy(head.telephone, newPerson.telephone);
+
+		r.push_back(head);
 		break;
 	}
 	case UPDATE:
 	{
-		// TODO create head
-		DataBaseManager::getInstance()->updatePerson(newPerson, true);
+		bool success;
+		int messageType;
+
+		success = DataBaseManager::getInstance()->updatePerson(newPerson, true);
+		messageType = true == success ? OPERATION_UPDATE_SUCCESS : OPERATION_FAILED;
+
+		struct messageResponse head;
+		head.clientId = request.clientId;
+		head.responseActionType = messageType;
+		head.numberOfRegisters = 0;
+		strcpy(head.name, newPerson.name);
+		strcpy(head.address, newPerson.address);
+		strcpy(head.telephone, newPerson.telephone);
+
+		r.push_back(head);
 		break;
 	}
 	case READ:
 	{
-		// TODO create head
 		std::list<struct person> persons = DataBaseManager::getInstance()->retrievePersons(
-				request.name, request.direction, request.telephone);
+				request.name, request.address, request.telephone);
+		std::list<struct person>::iterator it = persons.begin();
+
+		struct messageResponse head;
+		head.clientId = request.clientId;
+		head.responseActionType = HEAD;
+		head.numberOfRegisters = 0;
+		strcpy(head.name, newPerson.name);
+		strcpy(head.address, newPerson.address);
+		strcpy(head.telephone, newPerson.telephone);
+
+		r.push_back(head);
+
+		while( persons.end() != it )
+		{
+			struct messageResponse body;
+			body.clientId = request.clientId;
+			body.responseActionType = BODY;
+			body.numberOfRegisters = 0;
+			strcpy(body.name, it->name);
+			strcpy(body.address, it->address);
+			strcpy(body.telephone, it->telephone);
+
+			r.push_back(body);
+			it++;
+		}
 		break;
 	}
 	case DELETE:
 	{
-		// TODO create head
-		DataBaseManager::getInstance()->deletePerson(newPerson);
+		bool success;
+		int messageType;
+
+		success = DataBaseManager::getInstance()->deletePerson(newPerson);
+		messageType = true == success ? OPERATION_DELETE_SUCCESS : OPERATION_FAILED;
+
+		struct messageResponse head;
+		head.clientId = request.clientId;
+		head.responseActionType = messageType;
+		head.numberOfRegisters = 0;
+		strcpy(head.name, newPerson.name);
+		strcpy(head.address, newPerson.address);
+		strcpy(head.telephone, newPerson.telephone);
+
+		r.push_back(head);
 		break;
 	}
 	default :
 	{
-		// TODO create head for unknown action
+		struct messageResponse head;
+		head.clientId = request.clientId;
+		head.responseActionType = OPERATION_UNKNOWN;
+		head.numberOfRegisters = 0;
+		strcpy(head.name, newPerson.name);
+		strcpy(head.address, newPerson.address);
+		strcpy(head.telephone, newPerson.telephone);
+
+		r.push_back(head);
 		break;
 	}
 	}
@@ -207,16 +278,28 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 
 void sendResponse(std::list<struct messageResponse> responseStructures)
 {
-
+	std::list<struct messageResponse>::iterator it =
+		responseStructures.begin();
+	while(responseStructures.end() != it)
+	{
+		mqResponse->write(*it);
+		it++;
+	}
 }
 
 void saveDataBaseChanges()
 {
-
+	DataBaseManager::getInstance()->finalize();
 }
 
 void releaseMessageQueueResources()
 {
+	mqRequest->destroy();
+	mqResponse->destroy();
+	delete(mqRequest);
+	delete(mqResponse);
 
+	remove(ASSET_REQUEST_FILE);
+	remove(ASSET_RESPONSE_FILE);
 }
-#endif
+//#endif
