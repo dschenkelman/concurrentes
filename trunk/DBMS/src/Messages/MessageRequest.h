@@ -8,10 +8,10 @@
 
 typedef struct messageRequest{
 	long clientId;
-	int petitionActionType;
+	int requestActionType;
 
 	char name[SIZE_NAME];
-	char direction[SIZE_DIRECTION];
+	char address[SIZE_ADDRESS];
 	char telephone[SIZE_TELEPHONE];
 
 	char nameId[SIZE_NAME]; //Used for Update/Delete searches

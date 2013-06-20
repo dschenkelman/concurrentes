@@ -1,10 +1,13 @@
 #ifndef MESSAGE_QUEUE_H_
 #define MESSAGE_QUEUE_H_
 
+#include <string.h>
 #include <sys/types.h>
 #include <sys/msg.h>
 #include <sys/ipc.h>
 #include <stdio.h>
+
+using namespace std;
 
 template <class T> class MessageQueue {
 	private:
@@ -12,15 +15,16 @@ template <class T> class MessageQueue {
 		int		id;
 
 	public:
-		MessageQueue ( char* file,char letter );
+		MessageQueue ( const string& file );
 		~MessageQueue();
 		int write ( T data );
 		int read ( int type,T* buffer );
 		int destroy ();
 };
 
-template <class T> MessageQueue<T> :: MessageQueue ( char* file,char letter ) {
-	this->key = ftok ( file,letter );
+template <class T> MessageQueue<T> :: MessageQueue ( const string& file ) {
+	char letter = 'a';
+	this->key = ftok ( file.c_str(),letter );
 	if ( this->key == -1 )
 		perror ( "Ftok Error" );
 

@@ -27,7 +27,7 @@ public:
 
 	std::list<struct person> retrievePersons(
 			std::string namePattern,
-			std::string directionPattern,
+			std::string addressPattern,
 			std::string phonePattern);
 
 	bool createPerson(struct person person);

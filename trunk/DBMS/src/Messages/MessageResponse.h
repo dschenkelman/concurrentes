@@ -7,12 +7,12 @@
 
 typedef struct messageResponse {
 	long clientId; //Clients priority lookup
-	int answerActionType;
+	int responseActionType;
 
 	int numberOfRegisters; //Used in head action type
 
 	char name[SIZE_NAME];
-	char direction[SIZE_DIRECTION];
+	char address[SIZE_ADDRESS];
 	char telephone[SIZE_TELEPHONE];
 } messageResponse;
 
