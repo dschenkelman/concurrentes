@@ -1,4 +1,4 @@
-//#ifdef MAIN_CLIENT
+#ifdef MAIN_CLIENT
 
 #include <iostream>
 #include <stdlib.h>
@@ -143,4 +143,4 @@ void printMessageResponse(int requestAction, list<struct messageResponse>* vMess
 
 }
 
-//#endif
+#endif
