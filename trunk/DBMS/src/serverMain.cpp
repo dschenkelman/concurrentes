@@ -134,6 +134,7 @@ bool prepareDataBase()
 
 bool createMessageQueues()
 {
+	cout << "Creating MQs" << endl;
 	std::ofstream stream;
 	stream.open(ASSET_REQUEST_FILE, ios::out | ios::app);
 	stream.close();
@@ -143,14 +144,18 @@ bool createMessageQueues()
 	mqRequest = new MessageQueue<struct messageRequest>(ASSET_REQUEST_FILE);
 	mqResponse = new MessageQueue<struct messageResponse>(ASSET_RESPONSE_FILE);
 
-	return NULL == mqRequest || NULL == mqResponse;
+	cout << "MQs created" << endl;
+
+	return (NULL == mqRequest || NULL == mqResponse) ;
 }
 
 
 struct messageRequest readRequest()
 {
+	cout << "Reading next Request" << endl;
 	struct messageRequest r;
 	r = readRequestWithId(READ_NEXT);
+	cout << "Request Type: "<< r.requestActionType << endl;
 	return r;
 }
 
@@ -163,6 +168,7 @@ struct messageRequest readRequestWithId(int id)
 
 std::list<struct messageResponse> processRequest(struct messageRequest request)
 {
+	cout << "Processing Request" << endl;
 	std::list<struct messageResponse> r;
 	struct person newPerson;
 	strcpy(newPerson.name, request.name);
@@ -173,6 +179,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	{
 	case CREATE:
 	{
+		cout << "In create" << endl;
 		bool success;
 		int messageType;
 
@@ -192,6 +199,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	case UPDATE:
 	{
+		cout << "In update" << endl;
 		bool success;
 		int messageType;
 
@@ -211,6 +219,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	case READ:
 	{
+		cout << "In read" << endl;
 		std::list<struct person> persons = DataBaseManager::getInstance()->retrievePersons(
 				request.name, request.address, request.telephone);
 		std::list<struct person>::iterator it = persons.begin();
@@ -218,7 +227,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		struct messageResponse head;
 		head.clientId = request.clientId;
 		head.responseActionType = HEAD;
-		head.numberOfRegisters = 0;
+		head.numberOfRegisters = persons.size();
 		strcpy(head.name, newPerson.name);
 		strcpy(head.address, newPerson.address);
 		strcpy(head.telephone, newPerson.telephone);
@@ -242,6 +251,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	case DELETE:
 	{
+		cout << "In delete" << endl;
 		bool success;
 		int messageType;
 
@@ -261,6 +271,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	default :
 	{
+		cout << "In default" << endl;
 		struct messageResponse head;
 		head.clientId = request.clientId;
 		head.responseActionType = OPERATION_UNKNOWN;
@@ -278,6 +289,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 
 void sendResponse(std::list<struct messageResponse> responseStructures)
 {
+	cout << "Sending Response (Count: "<< responseStructures.size()<<")" << endl;
 	std::list<struct messageResponse>::iterator it =
 		responseStructures.begin();
 	while(responseStructures.end() != it)
@@ -289,11 +301,13 @@ void sendResponse(std::list<struct messageResponse> responseStructures)
 
 void saveDataBaseChanges()
 {
+	cout << "Saving db changes" << endl;
 	DataBaseManager::getInstance()->finalize();
 }
 
 void releaseMessageQueueResources()
 {
+	cout << "Releasing MQs resources" << endl;
 	mqRequest->destroy();
 	mqResponse->destroy();
 	delete(mqRequest);

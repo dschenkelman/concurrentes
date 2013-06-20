@@ -121,6 +121,7 @@ bool readMessageResponse(int clientId, MessageQueue<struct messageResponse>* mqR
 }
 
 void printMessageResponse(int requestAction, list<struct messageResponse>* vMessagesResponses){
+	cout << "#Responses: " << vMessagesResponses->size() << endl;
 	  cout << "Server Response:" << endl;
 	  if ( requestAction == READ ){
 		  cout << "Name \t Address \t Telephone" << endl;
