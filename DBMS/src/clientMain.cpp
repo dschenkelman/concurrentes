@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <list>
+#include <map>
 #include <string.h>
 #include <sys/stat.h>
 
@@ -100,52 +101,53 @@ bool readMessageResponse(int clientId, MessageQueue<struct messageResponse>* mqR
 
 	switch(msgFirstResponse.responseActionType){
 	case HEAD:
-
-		if ( msgFirstResponse.numberOfRegisters == 0 ){
-			vMessagesResponses->push_back(msgFirstResponse);
-		}else{
-			for(int i = 0; i < msgFirstResponse.numberOfRegisters; i++){
-				messageResponse msgResponse;
-				mqResponse->read(clientId,&msgResponse);
-				if ( msgResponse.responseActionType == ENDOFCONNECTION ){
-					perror("Server has shut down");
-					return false;
-				}
-				vMessagesResponses->push_back(msgResponse);
+		for(int i = 0; i < msgFirstResponse.numberOfRegisters; i++){
+			messageResponse msgResponse;
+			mqResponse->read(clientId,&msgResponse);
+			if ( msgResponse.responseActionType == ENDOFCONNECTION ){
+				cout << "Server has shut down" << endl;
+				return false;
 			}
+			vMessagesResponses->push_back(msgResponse);
 		}
 
 		break;
 
 	case ENDOFCONNECTION:
-		perror("Server has shut down");
+		cout << "Server has shut down" << endl;
 		return false;
+	default:
+		vMessagesResponses->push_back(msgFirstResponse);
+		break;
 	}
 
 	return true;
 }
 
 void printMessageResponse(int requestAction, list<struct messageResponse>* vMessagesResponses){
-	cout << "#Responses: " << vMessagesResponses->size() << endl;
-	  cout << "Server Response:" << endl;
-	  if ( requestAction == READ ){
-		  cout << "Name \t Address \t Telephone" << endl;
-		  for (list<struct messageResponse>::iterator it = vMessagesResponses->begin(); it != vMessagesResponses->end(); it++){
+	cout << "Server Response:" << endl << endl;
 
-			  if ( it->responseActionType == OPERATION_FAILED){
-				  cout << "Request operation failed" << endl;
-			  }
-			  cout << it->name << " \t " << it->address << " \t " << it->telephone << endl;
-		  }
-	  }else{
-		  if ( vMessagesResponses->begin()->responseActionType == OPERATION_FAILED){
-			  cout << "Request operation failed" << endl;
-		  }else{
-			  cout << "Request operation completed successfully" << endl;
-		  }
+	map<int, string> ResponsesStringTable;
+	ResponsesStringTable[OPERATION_FAILED] = "The requested operation has failed";
+	ResponsesStringTable[OPERATION_CREATE_SUCCESS] = "Create operation was successful";
+	ResponsesStringTable[OPERATION_UPDATE_SUCCESS] = "Update operation was successful";
+	ResponsesStringTable[OPERATION_DELETE_SUCCESS] = "Delete operation was successful";
+	ResponsesStringTable[OPERATION_UNKNOWN] = "Unknown operation. Please retry";
 
+	if ( requestAction == READ ){
+	  for (list<struct messageResponse>::iterator it = vMessagesResponses->begin(); it != vMessagesResponses->end(); it++){
+
+		  if ( it->responseActionType == OPERATION_FAILED){
+			  cout << ResponsesStringTable[OPERATION_FAILED] << endl;
+		  }
+		  cout << it->name << endl;
+		  cout << "\t" << it->address << endl;
+		  cout << "\t" << it->telephone << endl;
+		  cout << "-------------------" << endl;
 	  }
-
+  }else{
+	  cout << ResponsesStringTable[vMessagesResponses->begin()->responseActionType] << endl;
+  }
 
 }
 
