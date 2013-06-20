@@ -1,23 +1,19 @@
-/*
- * DataBaseManager.cpp
- *
- *  Created on: 20/06/2013
- *      Author: matias
- */
-
 #include "DataBaseManager.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+using namespace std;
 
 DataBaseManager* DataBaseManager::instance = NULL;
 
+const string DataBaseManager::dbFile = "DBFile";
+
 DataBaseManager::DataBaseManager()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 DataBaseManager::~DataBaseManager()
 {
-	// TODO Auto-generated destructor stub
 }
 
 DataBaseManager *DataBaseManager::getInstance()
@@ -31,7 +27,28 @@ DataBaseManager *DataBaseManager::getInstance()
 
 bool DataBaseManager::initialize()
 {
-	// TODO mocked person registers
+
+	char name[61],address[120],telephone[13];
+
+    FILE *fd = fopen(this->dbFile.c_str(), "r");
+
+	if (fd == NULL){
+		perror("Database couldn't be found or read");
+		return false;
+	}
+
+    while (fscanf(fd, "%61[^;];%120[^;];%13[^;]",name,address,telephone) == 3){
+    	person pAux;
+    	strcpy(pAux.name,name);
+    	strcpy(pAux.address,address);
+    	strcpy(pAux.telephone,telephone);
+
+    	this->persons.push_back(pAux);
+    }
+
+    fclose(fd);
+
+    /*
 	struct person matias;
 	strcpy(matias.name, "Matias Servetto");
 	strcpy(matias.address, "Ecuador 871");
@@ -49,6 +66,7 @@ bool DataBaseManager::initialize()
 	strcpy(damian.address, "Caballito");
 	strcpy(damian.telephone, "1150505050");
 	persons.push_back(damian);
+	*/
 
 	return true;
 }
@@ -172,6 +190,19 @@ bool DataBaseManager::deletePerson(struct person person)
 
 bool DataBaseManager::finalize()
 {
+	FILE * fd;
+	fd = fopen ("file.txt","w+");
+
+	if (fd == NULL){
+		perror("Database couldn't be found or read");
+		return false;
+	}
+
+	for (list<struct person>::iterator it = persons.begin(); it != persons.end(); it++){
+		fprintf (fd, "%s;%s;%s", it->name, it->address, it->telephone);
+	}
+
+	fclose (fd);
 
 	return true;
 }

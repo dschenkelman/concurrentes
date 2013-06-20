@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 	messageRequest messageReq;
 
 	if (! packageMessageRequest(clientId,argc,argv,&messageReq)){
-		perror("packageMessageRequest failed");
+		perror("Packaging the MessageRequest failed");
 		exit(1);
 	}
 
