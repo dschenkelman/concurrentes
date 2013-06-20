@@ -1,11 +1,11 @@
-#ifndef MESSAGEANSWER_H_
-#define MESSAGEANSWER_H_
+#ifndef MESSAGERESPONSE_H_
+#define MESSAGERESPONSE_H_
 
 #define SIZE_NAME 61
 #define SIZE_DIRECTION 120
 #define SIZE_TELEPHONE 13
 
-typedef struct messageAnswer {
+typedef struct messageResponse {
 	long clientId; //Clients priority lookup
 	int answerActionType;
 
@@ -17,4 +17,4 @@ typedef struct messageAnswer {
 } messageAnswer;
 
 
-#endif /* MESSAGEANSWER_H_ */
+#endif /* MESSAGERESPONSE_H_ */
