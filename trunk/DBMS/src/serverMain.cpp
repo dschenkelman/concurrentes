@@ -1,9 +1,10 @@
-#ifdef MAIN_SERVER
+//#ifdef MAIN_SERVER
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <list>
+#include <errno.h>
 
 #include "Messages/MessageActions.h"
 #include "Messages/MessageRequest.h"
@@ -18,6 +19,8 @@ using namespace std;
 #define READ_NEXT 0
 
 
+bool isWorking = true;
+
 MessageQueue<messageRequest> *mqRequest = NULL;
 MessageQueue<messageResponse> *mqResponse = NULL;
 
@@ -27,6 +30,8 @@ struct messageRequest readRequest();
 struct messageRequest readRequestWithId(int id);
 std::list<struct messageResponse> processRequest(struct messageRequest request);
 void sendResponse(std::list<struct messageResponse> responseStructures);
+
+void prepareForGracefullQuit();
 void saveDataBaseChanges();
 void releaseMessageQueueResources();
 
@@ -34,7 +39,6 @@ int main(int argc, char **argv)
 {
 
 	bool error;
-	bool isWorking;
 
 	error = prepareDataBase();
 	if( true == error )
@@ -60,7 +64,10 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	isWorking = true;
+	int seconds = 30;
+	cout << "Waiting " << seconds << " seconds for clients to enqueue" << endl;
+	sleep(seconds);
+
 	while( isWorking )
 	{
 		struct messageRequest request;
@@ -80,55 +87,6 @@ int main(int argc, char **argv)
 bool prepareDataBase()
 {
 	bool success = DataBaseManager::getInstance()->initialize();
-/*
-	cout << "Initial data" << endl;
-	std::list<struct person> list = DataBaseManager::getInstance()->retrievePersons("*", "*", "*");
-	std::list<struct person>::iterator it = list.begin();
-	while( list.end() != it )
-	{
-		cout << it->name << "," << it->address << "," << it->telephone << endl;
-		it++;
-	}
-
-	cout << endl <<"Modified Data:" << endl;
-
-	struct person person;
-	strcpy(person.name, "Matias Servetto");
-	strcpy(person.address, "El Talar - Ecuador 871");
-	strcpy(person.telephone, "1170707060");
-	DataBaseManager::getInstance()->updatePerson(person, true);
-	strcpy(person.name, "Sebastian Rodriguez");
-	strcpy(person.address, "Ugart");
-	strcpy(person.telephone, "120");
-	DataBaseManager::getInstance()->updatePerson(person, true);
-	strcpy(person.name, "MOMO");
-	strcpy(person.address, "aasasa");
-	strcpy(person.telephone, "asajksa");
-	DataBaseManager::getInstance()->updatePerson(person, false);
-	strcpy(person.name, "POPO");
-	strcpy(person.address, "aasasa");
-	strcpy(person.telephone, "asajksa");
-	DataBaseManager::getInstance()->updatePerson(person, true);
-
-	list = DataBaseManager::getInstance()->retrievePersons("*", "*", "*");
-	it = list.begin();
-	while( list.end() != it )
-	{
-		cout << it->name << "," << it->address << "," << it->telephone << endl;
-		it++;
-	}
-
-	cout << endl <<"Filtered Data:" << endl;
-
-	list = DataBaseManager::getInstance()->retrievePersons("*", "*", "*");
-	it = list.begin();
-	while( list.end() != it )
-	{
-		cout << it->name << "," << it->address << "," << it->telephone << endl;
-		it++;
-	}
-*/
-
 	return !success;
 }
 
@@ -203,7 +161,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		bool success;
 		int messageType;
 
-		success = DataBaseManager::getInstance()->updatePerson(newPerson, true);
+		success = DataBaseManager::getInstance()->updatePerson(request.nameId, newPerson, true);
 		messageType = true == success ? OPERATION_UPDATE_SUCCESS : OPERATION_FAILED;
 
 		struct messageResponse head;
@@ -269,6 +227,12 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		r.push_back(head);
 		break;
 	}
+	case ENDOFCONNECTION:
+	{
+		prepareForGracefullQuit();
+		isWorking = false;
+		break;
+	}
 	default :
 	{
 		cout << "In default" << endl;
@@ -313,7 +277,26 @@ void releaseMessageQueueResources()
 	delete(mqRequest);
 	delete(mqResponse);
 
+}
+
+void prepareForGracefullQuit()
+{
+	cout << "Preparing for GracefullQuit" << endl;
+	// remove temp files (this way if a client wants to open a conection it stops)
 	remove(ASSET_REQUEST_FILE);
 	remove(ASSET_RESPONSE_FILE);
+
+	struct messageRequest request;
+	std::list<struct messageResponse> eocResponses;
+	while( EAGAIN != mqRequest->readWithoutBlocking(0, &request) )
+	{
+		struct messageResponse eocResponse;
+		eocResponse.clientId = request.clientId;
+		eocResponse.responseActionType = ENDOFCONNECTION;
+		eocResponse.numberOfRegisters = 0;
+		eocResponses.push_back(eocResponse);
+	}
+	sendResponse(eocResponses);
 }
-#endif
+
+//#endif

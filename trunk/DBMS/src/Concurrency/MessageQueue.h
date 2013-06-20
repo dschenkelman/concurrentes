@@ -6,6 +6,7 @@
 #include <sys/msg.h>
 #include <sys/ipc.h>
 #include <stdio.h>
+#include "mqueue.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ template <class T> class MessageQueue {
 		~MessageQueue();
 		int write ( T data );
 		int read ( int type,T* buffer );
+		int readWithoutBlocking ( int type,T* buffer );
 		int destroy ();
 };
 
@@ -48,6 +50,12 @@ template <class T> int MessageQueue<T> :: write ( T data ) {
 
 template <class T> int MessageQueue<T> :: read ( int type,T* buffer ) {
 	int result = msgrcv ( this->id,(void *)buffer,sizeof(T)-sizeof(long),type,0 );
+	return result;
+}
+
+template <class T> int MessageQueue<T> :: readWithoutBlocking ( int type,T* buffer )
+{
+	int result = msgrcv ( this->id,(void *)buffer,sizeof(T)-sizeof(long),type, O_NONBLOCK);
 	return result;
 }
 

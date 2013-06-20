@@ -115,7 +115,7 @@ bool DataBaseManager::createPerson(struct person person)
 	return true;
 }
 
-bool DataBaseManager::updatePerson(struct person person, bool createIfNeeded)
+bool DataBaseManager::updatePerson(char *nameId, struct person person, bool createIfNeeded)
 {
 	bool notFound = true;
 
@@ -125,7 +125,7 @@ bool DataBaseManager::updatePerson(struct person person, bool createIfNeeded)
 	{
 		struct person iteratedPerson = *personIterator;
 
-		if( 0 == strcmp(person.name, iteratedPerson.name) )
+		if( 0 == strcmp(person.name, nameId) )
 		{
 			notFound = false;
 			strcpy(personIterator->name, person.name);

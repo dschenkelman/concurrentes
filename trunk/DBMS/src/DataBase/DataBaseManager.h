@@ -31,7 +31,7 @@ public:
 			std::string phonePattern);
 
 	bool createPerson(struct person person);
-	bool updatePerson(struct person person, bool createIfNeeded);
+	bool updatePerson(char *nameId, struct person person, bool createIfNeeded);
 	bool deletePerson(struct person person);
 
 	bool finalize();
