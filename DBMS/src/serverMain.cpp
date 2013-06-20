@@ -69,6 +69,16 @@ int main(int argc, char **argv)
 bool prepareDataBase()
 {
 	bool success = DataBaseManager::getInstance()->initialize();
+
+	std::list<struct person> list = DataBaseManager::getInstance()->retrievePersons("*", "*", "*");
+	std::list<struct person>::iterator it = list.begin();
+	while( list.end() != it )
+	{
+		cout << it->name << "," << it->direction << "," << it->telephone << endl;
+		it++;
+	}
+
+
 	return !success;
 }
 
