@@ -11,13 +11,21 @@
 
 #include "DataBase/DataBaseManager.h"
 
+#include "Concurrency/MessageQueue.h"
+
 using namespace std;
+
+#define READ_NEXT 0
+
+
+MessageQueue<messageRequest> *mqRequest = NULL;
+MessageQueue<messageResponse> *mqResponse = NULL;
 
 bool prepareDataBase();
 bool createMessageQueues();
 struct messageRequest readRequest();
-std::list<std::string> processRequest(struct messageRequest request);
-std::list<struct messageResponse> createResponse(int clientId, std::list<std::string> registers);
+struct messageRequest readRequestWithId(int id);
+std::list<struct messageResponse> processRequest(struct messageRequest request);
 void sendResponse(std::list<struct messageResponse> responseStructures);
 void saveDataBaseChanges();
 void releaseMessageQueueResources();
@@ -39,6 +47,16 @@ int main(int argc, char **argv)
 	if( true == error )
 	{
 		cout << "createMessageQueues() error" << endl;
+		if( NULL != mqRequest )
+		{
+			mqRequest->destroy();
+			delete( mqRequest );
+		}
+		if( NULL != mqResponse )
+		{
+			mqResponse->destroy();
+			delete( mqResponse );
+		}
 		exit(1);
 	}
 
@@ -46,12 +64,10 @@ int main(int argc, char **argv)
 	while( isWorking )
 	{
 		struct messageRequest request;
-		std::list<std::string> registers;
 		std::list<struct messageResponse> responseStructures;
 
 		request = readRequest();
-		registers = processRequest(request);
-		responseStructures = createResponse(request.clientId, registers);
+		responseStructures = processRequest(request);
 		sendResponse(responseStructures);
 	}
 
@@ -118,29 +134,77 @@ bool prepareDataBase()
 
 bool createMessageQueues()
 {
-	return true;
+	std::ofstream stream;
+	stream.open(ASSET_REQUEST_FILE, ios::out | ios::app);
+	stream.close();
+	stream.open(ASSET_RESPONSE_FILE, ios::out | ios::app);
+	stream.close();
+
+	mqRequest = new MessageQueue<struct messageRequest>(ASSET_REQUEST_FILE, 'a');
+	mqResponse = new MessageQueue<struct messageResponse>(ASSET_RESPONSE_FILE, 'a');
+
+	return NULL == mqRequest || NULL == mqResponse;
 }
 
 
 struct messageRequest readRequest()
 {
 	struct messageRequest r;
-
+	r = readRequestWithId(READ_NEXT);
 	return r;
 }
 
-std::list<std::string> processRequest(struct messageRequest request)
+struct messageRequest readRequestWithId(int id)
 {
-	std::list<std::string> r;
-
+	struct messageRequest r;
+	mqRequest->read(id, &r);
 	return r;
 }
-std::list<struct messageResponse> createResponse(int clientId, std::list<std::string> registers)
+
+std::list<struct messageResponse> processRequest(struct messageRequest request)
 {
 	std::list<struct messageResponse> r;
+	struct person newPerson;
+	strcpy(newPerson.name, request.name);
+	strcpy(newPerson.direction, request.direction);
+	strcpy(newPerson.telephone, request.telephone);
 
+	switch(request.petitionActionType)
+	{
+	case CREATE:
+	{
+		// TODO create head
+		DataBaseManager::getInstance()->createPerson(newPerson);
+		break;
+	}
+	case UPDATE:
+	{
+		// TODO create head
+		DataBaseManager::getInstance()->updatePerson(newPerson, true);
+		break;
+	}
+	case READ:
+	{
+		// TODO create head
+		std::list<struct person> persons = DataBaseManager::getInstance()->retrievePersons(
+				request.name, request.direction, request.telephone);
+		break;
+	}
+	case DELETE:
+	{
+		// TODO create head
+		DataBaseManager::getInstance()->deletePerson(newPerson);
+		break;
+	}
+	default :
+	{
+		// TODO create head for unknown action
+		break;
+	}
+	}
 	return r;
 }
+
 void sendResponse(std::list<struct messageResponse> responseStructures)
 {
 
