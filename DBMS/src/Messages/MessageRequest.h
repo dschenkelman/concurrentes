@@ -1,11 +1,10 @@
 #ifndef MESSAGEREQUEST_H_
 #define MESSAGEREQUEST_H_
 
+#include "../DataBase/PersonRegister.h"
+
 #define ASSET_REQUEST_FILE "/tmp/request.file"
 
-#define SIZE_NAME 61
-#define SIZE_DIRECTION 120
-#define SIZE_TELEPHONE 13
 
 typedef struct messageRequest{
 	long clientId;
