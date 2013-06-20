@@ -1,4 +1,4 @@
-#ifdef MAIN_CLIENT
+//#ifdef MAIN_CLIENT
 
 #include <iostream>
 #include <stdlib.h>
@@ -70,9 +70,9 @@ bool packageMessageRequest(int clientId,int parametersSize, char* petitionParame
 	}else{
 		message->clientId = clientId;
 		message->requestActionType = Convert::toInt(petitionParameters[1]);
-		strcpy ( message->name, petitionParameters[2] );
-		strcpy ( message->address, petitionParameters[3] );
-		strcpy ( message->telephone, petitionParameters[4] );
+		strcpy ( message->name, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[2]);
+		strcpy ( message->address, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[3] );
+		strcpy ( message->telephone, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[4] );
 		if ( parametersSize > 5 ){
 			strcpy ( message->nameId, petitionParameters[5] );
 		}else{
@@ -101,15 +101,20 @@ bool readMessageResponse(int clientId, MessageQueue<struct messageResponse>* mqR
 	switch(msgFirstResponse.responseActionType){
 	case HEAD:
 
-		for(int i = 0; i < msgFirstResponse.numberOfRegisters; i++){
-			messageResponse msgResponse;
-			mqResponse->read(clientId,&msgResponse);
-			if ( msgResponse.responseActionType == ENDOFCONNECTION ){
-				perror("Server has shut down");
-				return false;
+		if ( msgFirstResponse.numberOfRegisters == 0 ){
+			vMessagesResponses->push_back(msgFirstResponse);
+		}else{
+			for(int i = 0; i < msgFirstResponse.numberOfRegisters; i++){
+				messageResponse msgResponse;
+				mqResponse->read(clientId,&msgResponse);
+				if ( msgResponse.responseActionType == ENDOFCONNECTION ){
+					perror("Server has shut down");
+					return false;
+				}
+				vMessagesResponses->push_back(msgResponse);
 			}
-			vMessagesResponses->push_back(msgResponse);
 		}
+
 		break;
 
 	case ENDOFCONNECTION:
@@ -144,4 +149,4 @@ void printMessageResponse(int requestAction, list<struct messageResponse>* vMess
 
 }
 
-#endif
+//#endif

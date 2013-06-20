@@ -1,4 +1,4 @@
-//#ifdef MAIN_SERVER
+#ifdef MAIN_SERVER
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -316,4 +316,4 @@ void releaseMessageQueueResources()
 	remove(ASSET_REQUEST_FILE);
 	remove(ASSET_RESPONSE_FILE);
 }
-//#endif
+#endif
