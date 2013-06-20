@@ -1,9 +1,4 @@
-/*
- * serverMain.cpp
- *
- *  Created on: 20/06/2013
- *      Author: matias
- */
+#ifdef MAIN_SERVER
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -75,7 +70,7 @@ bool prepareDataBase()
 	std::list<struct person>::iterator it = list.begin();
 	while( list.end() != it )
 	{
-		cout << it->name << "," << it->direction << "," << it->telephone << endl;
+		cout << it->name << "," << it->address << "," << it->telephone << endl;
 		it++;
 	}
 
@@ -83,19 +78,19 @@ bool prepareDataBase()
 
 	struct person person;
 	strcpy(person.name, "Matias Servetto");
-	strcpy(person.direction, "El Talar - Ecuador 871");
+	strcpy(person.address, "El Talar - Ecuador 871");
 	strcpy(person.telephone, "1170707060");
 	DataBaseManager::getInstance()->updatePerson(person, true);
 	strcpy(person.name, "Sebastian Rodriguez");
-	strcpy(person.direction, "Ugart");
+	strcpy(person.address, "Ugart");
 	strcpy(person.telephone, "120");
 	DataBaseManager::getInstance()->updatePerson(person, true);
 	strcpy(person.name, "MOMO");
-	strcpy(person.direction, "aasasa");
+	strcpy(person.address, "aasasa");
 	strcpy(person.telephone, "asajksa");
 	DataBaseManager::getInstance()->updatePerson(person, false);
 	strcpy(person.name, "POPO");
-	strcpy(person.direction, "aasasa");
+	strcpy(person.address, "aasasa");
 	strcpy(person.telephone, "asajksa");
 	DataBaseManager::getInstance()->updatePerson(person, true);
 
@@ -103,7 +98,7 @@ bool prepareDataBase()
 	it = list.begin();
 	while( list.end() != it )
 	{
-		cout << it->name << "," << it->direction << "," << it->telephone << endl;
+		cout << it->name << "," << it->address << "," << it->telephone << endl;
 		it++;
 	}
 
@@ -113,7 +108,7 @@ bool prepareDataBase()
 	it = list.begin();
 	while( list.end() != it )
 	{
-		cout << it->name << "," << it->direction << "," << it->telephone << endl;
+		cout << it->name << "," << it->address << "," << it->telephone << endl;
 		it++;
 	}
 */
@@ -160,3 +155,4 @@ void releaseMessageQueueResources()
 {
 
 }
+#endif

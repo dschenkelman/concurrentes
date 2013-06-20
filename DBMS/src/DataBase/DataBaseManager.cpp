@@ -34,19 +34,19 @@ bool DataBaseManager::initialize()
 	// TODO mocked person registers
 	struct person matias;
 	strcpy(matias.name, "Matias Servetto");
-	strcpy(matias.direction, "Ecuador 871");
+	strcpy(matias.address, "Ecuador 871");
 	strcpy(matias.telephone, "1170707070");
 	persons.push_back(matias);
 
 	struct person sebastian;
 	strcpy(sebastian.name, "Sebastian Rodriguez");
-	strcpy(sebastian.direction, "Ugarte y Maipu");
+	strcpy(sebastian.address, "Ugarte y Maipu");
 	strcpy(sebastian.telephone, "1160606060");
 	persons.push_back(sebastian);
 
 	struct person damian;
 	strcpy(damian.name, "Damian Schenkelman");
-	strcpy(damian.direction, "Caballito");
+	strcpy(damian.address, "Caballito");
 	strcpy(damian.telephone, "1150505050");
 	persons.push_back(damian);
 
@@ -85,7 +85,7 @@ std::list<struct person> DataBaseManager::retrievePersons(
 		}
 		if( filterByAddress )
 		{
-			std::string address(iterator->direction);
+			std::string address(iterator->address);
 			if( address.find(addressPattern) )
 			{
 				iterator++;
@@ -127,7 +127,7 @@ bool DataBaseManager::updatePerson(struct person person, bool createIfNeeded)
 		{
 			notFound = false;
 			strcpy(personIterator->name, person.name);
-			strcpy(personIterator->direction, person.direction);
+			strcpy(personIterator->address, person.address);
 			strcpy(personIterator->telephone, person.telephone);
 			return true;
 		}

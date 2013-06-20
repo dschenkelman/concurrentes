@@ -9,13 +9,13 @@
 #define PERSONREGISTER_H_
 
 #define SIZE_NAME 61
-#define SIZE_DIRECTION 120
+#define SIZE_ADDRESS 120
 #define SIZE_TELEPHONE 13
 
 typedef struct person
 {
 	char name[SIZE_NAME];
-	char direction[SIZE_DIRECTION];
+	char address[SIZE_ADDRESS];
 	char telephone[SIZE_TELEPHONE];
 } person;
 

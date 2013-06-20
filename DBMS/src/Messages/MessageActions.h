@@ -16,7 +16,7 @@
 
 //Used for messages responses
 #define HEAD 5
-#define BODY 6
+#define OPERATION_FAILED 6
 #define ENDOFCONNECTION 7
 
 
