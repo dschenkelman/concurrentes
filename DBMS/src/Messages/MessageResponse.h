@@ -1,6 +1,8 @@
 #ifndef MESSAGERESPONSE_H_
 #define MESSAGERESPONSE_H_
 
+#define ASSET_RESPONSE_FILE "/tmp/response.file"
+
 #define SIZE_NAME 61
 #define SIZE_DIRECTION 120
 #define SIZE_TELEPHONE 13
@@ -14,7 +16,7 @@ typedef struct messageResponse {
 	char name[SIZE_NAME];
 	char direction[SIZE_DIRECTION];
 	char telephone[SIZE_TELEPHONE];
-} messageAnswer;
+} messageResponse;
 
 
 #endif /* MESSAGERESPONSE_H_ */
