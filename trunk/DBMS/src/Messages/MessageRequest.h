@@ -1,11 +1,11 @@
-#ifndef MESSAGEPETITION_H_
-#define MESSAGEPETITION_H_
+#ifndef MESSAGEREQUEST_H_
+#define MESSAGEREQUEST_H_
 
 #define SIZE_NAME 61
 #define SIZE_DIRECTION 120
 #define SIZE_TELEPHONE 13
 
-typedef struct messagePetition {
+typedef struct messageRequest{
 	long clientId;
 	int petitionActionType;
 
@@ -17,4 +17,4 @@ typedef struct messagePetition {
 } messagePetition;
 
 
-#endif /* MESSAGEPETITION_H_ */
+#endif /* MESSAGEREQUEST H_ */
