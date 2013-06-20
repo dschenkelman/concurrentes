@@ -70,9 +70,40 @@ std::list<struct person> DataBaseManager::retrievePersons(
 	}
 
 	std::list<struct person> filteredPersons;
+	std::list<struct person>::iterator iterator = persons.begin();
 
-
-
+	while( persons.end() != iterator )
+	{
+		if( filterByName )
+		{
+			std::string name(iterator->name);
+			if( name.find(namePattern) )
+			{
+				iterator++;
+				continue;
+			}
+		}
+		if( filterByAddress )
+		{
+			std::string address(iterator->direction);
+			if( address.find(addressPattern) )
+			{
+				iterator++;
+				continue;
+			}
+		}
+		if( filterByPhone )
+		{
+			std::string phone(iterator->telephone);
+			if( phone.find(phonePattern) )
+			{
+				iterator++;
+				continue;
+			}
+		}
+		filteredPersons.push_back(*iterator);
+		iterator++;
+	}
 	return filteredPersons;
 }
 
@@ -95,9 +126,9 @@ bool DataBaseManager::updatePerson(struct person person, bool createIfNeeded)
 		if( 0 == strcmp(person.name, iteratedPerson.name) )
 		{
 			notFound = false;
-			strcpy(iteratedPerson.name, person.name);
-			strcpy(iteratedPerson.direction, person.direction);
-			strcpy(iteratedPerson.telephone, person.telephone);
+			strcpy(personIterator->name, person.name);
+			strcpy(personIterator->direction, person.direction);
+			strcpy(personIterator->telephone, person.telephone);
 			return true;
 		}
 		else

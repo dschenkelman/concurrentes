@@ -69,7 +69,8 @@ int main(int argc, char **argv)
 bool prepareDataBase()
 {
 	bool success = DataBaseManager::getInstance()->initialize();
-
+/*
+	cout << "Initial data" << endl;
 	std::list<struct person> list = DataBaseManager::getInstance()->retrievePersons("*", "*", "*");
 	std::list<struct person>::iterator it = list.begin();
 	while( list.end() != it )
@@ -78,6 +79,44 @@ bool prepareDataBase()
 		it++;
 	}
 
+	cout << endl <<"Modified Data:" << endl;
+
+	struct person person;
+	strcpy(person.name, "Matias Servetto");
+	strcpy(person.direction, "El Talar - Ecuador 871");
+	strcpy(person.telephone, "1170707060");
+	DataBaseManager::getInstance()->updatePerson(person, true);
+	strcpy(person.name, "Sebastian Rodriguez");
+	strcpy(person.direction, "Ugart");
+	strcpy(person.telephone, "120");
+	DataBaseManager::getInstance()->updatePerson(person, true);
+	strcpy(person.name, "MOMO");
+	strcpy(person.direction, "aasasa");
+	strcpy(person.telephone, "asajksa");
+	DataBaseManager::getInstance()->updatePerson(person, false);
+	strcpy(person.name, "POPO");
+	strcpy(person.direction, "aasasa");
+	strcpy(person.telephone, "asajksa");
+	DataBaseManager::getInstance()->updatePerson(person, true);
+
+	list = DataBaseManager::getInstance()->retrievePersons("*", "*", "*");
+	it = list.begin();
+	while( list.end() != it )
+	{
+		cout << it->name << "," << it->direction << "," << it->telephone << endl;
+		it++;
+	}
+
+	cout << endl <<"Filtered Data:" << endl;
+
+	list = DataBaseManager::getInstance()->retrievePersons("*", "*", "*");
+	it = list.begin();
+	while( list.end() != it )
+	{
+		cout << it->name << "," << it->direction << "," << it->telephone << endl;
+		it++;
+	}
+*/
 
 	return !success;
 }
