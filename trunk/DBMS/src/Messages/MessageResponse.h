@@ -3,9 +3,7 @@
 
 #define ASSET_RESPONSE_FILE "/tmp/response.file"
 
-#define SIZE_NAME 61
-#define SIZE_DIRECTION 120
-#define SIZE_TELEPHONE 13
+#include "../DataBase/PersonRegister.h"
 
 typedef struct messageResponse {
 	long clientId; //Clients priority lookup
