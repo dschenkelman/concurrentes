@@ -8,11 +8,14 @@
 #ifndef DATABASEMANAGER_H_
 #define DATABASEMANAGER_H_
 
-#include <string>
+#include <string.h>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <list>
+#include <stdio.h>
+
+#include "PersonRegister.h"
 
 class DataBaseManager
 {
@@ -22,11 +25,22 @@ public:
 
 	bool initialize();
 
+	std::list<struct person> retrievePersons(
+			std::string namePattern,
+			std::string directionPattern,
+			std::string phonePattern);
+
+	bool createPerson(struct person person);
+	bool updatePerson(struct person person, bool createIfNeeded);
+	bool deletePerson(struct person person);
+
+	bool finalize();
+
 protected:
 	DataBaseManager();
 
 private:
-	std::list<std::string> registers;
+	std::list<struct person> persons;
 	static DataBaseManager *instance;
 };
 
