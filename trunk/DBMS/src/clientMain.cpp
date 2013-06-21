@@ -24,9 +24,9 @@ bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesRe
 void printMessageResponse(int requestAction,list<struct messageResponse>* vMessagesResponses);
 void releaseMessageQueuesResources();
 
-bool gracefulQuitRequested;
-MessageQueue<messageRequest>* mqRequest = NULL;
-MessageQueue<messageResponse>* mqResponse = NULL;
+bool GracefulQuitRequested;
+MessageQueue<messageRequest>* MQRequest = NULL;
+MessageQueue<messageResponse>* MQResponse = NULL;
 
 using namespace std;
 
@@ -41,13 +41,13 @@ int main(int argc, char* argv[]) {
 
 	if( checkConnectionWithServer() ){
 
-		mqRequest = new MessageQueue<struct messageRequest>(ASSET_REQUEST_FILE);
-		mqResponse = new MessageQueue<struct messageResponse>(ASSET_RESPONSE_FILE);
+		MQRequest = new MessageQueue<struct messageRequest>(ASSET_REQUEST_FILE);
+		MQResponse = new MessageQueue<struct messageResponse>(ASSET_RESPONSE_FILE);
 
 		if (sendMessageRequest(messageReq) == 0){
 			list<struct messageResponse> vMessagesResponses;
 			if ( readMessageResponse(clientId,&vMessagesResponses)){
-				if (!gracefulQuitRequested){
+				if (!GracefulQuitRequested){
 					printMessageResponse(messageReq.requestActionType,&vMessagesResponses);
 				}
 			}else{
@@ -93,15 +93,15 @@ bool checkConnectionWithServer(){
 }
 
 int sendMessageRequest(struct messageRequest message){
-	gracefulQuitRequested = (message.requestActionType == GRACEFUL_QUIT);
-	return (mqRequest->write(message));
+	GracefulQuitRequested = (message.requestActionType == GRACEFUL_QUIT);
+	return (MQRequest->write(message));
 }
 
 bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesResponses){
 
 	messageResponse msgFirstResponse;
-	int idRead = gracefulQuitRequested ? 1 : clientId;
-	int result = mqResponse->read(idRead,&msgFirstResponse);
+	int idRead = GracefulQuitRequested ? 1 : clientId;
+	int result = MQResponse->read(idRead,&msgFirstResponse);
 	if ( -1 == result ){
 		return false;
 	}
@@ -109,7 +109,7 @@ bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesRe
 	case HEAD:
 		for(int i = 0; i < msgFirstResponse.numberOfRegisters; i++){
 			messageResponse msgResponse;
-			result = mqResponse->read(clientId,&msgResponse);
+			result = MQResponse->read(clientId,&msgResponse);
 			if ( -1 == result ){
 				return false;
 			}
@@ -161,8 +161,8 @@ void printMessageResponse(int requestAction, list<struct messageResponse>* vMess
 }
 
 void releaseMessageQueuesResources(){
-	delete(mqRequest);
-	delete(mqResponse);
+	delete(MQRequest);
+	delete(MQResponse);
 }
 
 #endif

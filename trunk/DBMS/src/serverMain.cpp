@@ -53,6 +53,9 @@ int main(int argc, char **argv)
 	if( true == error )
 	{
 		cout << "createMessageQueues() error" << endl;
+		remove(ASSET_REQUEST_FILE);
+		remove(ASSET_RESPONSE_FILE);
+
 		if( NULL != mqRequest )
 		{
 			mqRequest->destroy();
@@ -115,27 +118,27 @@ bool createMessageQueues()
 struct messageRequest readRequest()
 {
 	cout << "Reading next Request" << endl;
-	struct messageRequest r;
-	r = readRequestWithId(READ_NEXT);
-	cout << "Request Type: "<< r.requestActionType << endl;
-	return r;
+	struct messageRequest request;
+	request = readRequestWithId(READ_NEXT);
+	cout << "Request Type: "<< request.requestActionType << endl;
+	return request;
 }
 
 struct messageRequest readRequestWithId(int id)
 {
-	struct messageRequest r;
-	mqRequest->read(id, &r);
-	return r;
+	struct messageRequest request;
+	mqRequest->read(id, &request);
+	return request;
 }
 
 
 struct messageRequest checkForAdministratorRequest()
 {
-	struct messageRequest r;
-	int result = mqRequest->readWithoutBlocking(1, &r);
+	struct messageRequest adminRequest;
+	int result = mqRequest->readWithoutBlocking(1, &adminRequest);
 	if( -1 == result )
-		r.requestActionType = NULL_ACTION_TYPE;
-	return r;
+		adminRequest.requestActionType = NULL_ACTION_TYPE;
+	return adminRequest;
 }
 
 std::list<struct messageResponse> processRequest(struct messageRequest request)
@@ -175,7 +178,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		bool success;
 		int messageType;
 
-		success = DataBaseManager::getInstance()->updatePerson(request.nameId, newPerson, true);
+		success = DataBaseManager::getInstance()->updatePerson(request.nameId, newPerson, false);
 		messageType = true == success ? OPERATION_UPDATE_SUCCESS : OPERATION_FAILED;
 
 		struct messageResponse head;
@@ -305,6 +308,7 @@ void prepareForGracefullQuit()
 	std::list<struct messageResponse> eocResponses;
 	while( -1 != mqRequest->readWithoutBlocking(0, &request) )
 	{
+		// Prepare response for processes who are waiting for a response
 		struct messageResponse eocResponse;
 		eocResponse.clientId = request.clientId;
 		cout << "ClientId: " << eocResponse.clientId << endl;
@@ -312,12 +316,14 @@ void prepareForGracefullQuit()
 		eocResponse.numberOfRegisters = 0;
 		eocResponses.push_back(eocResponse);
 	}
+	// inform the administrator that server has gracefully quit
 	struct messageResponse eocResponse;
 	eocResponse.clientId = 1;
 	cout << "ClientId (the administrator): " << 1 << endl;
 	eocResponse.responseActionType = ENDOFCONNECTION;
 	eocResponse.numberOfRegisters = 0;
 	eocResponses.push_back(eocResponse);
+
 	sendResponse(eocResponses);
 }
 
