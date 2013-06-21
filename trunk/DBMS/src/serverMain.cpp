@@ -178,7 +178,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		bool success;
 		int messageType;
 
-		success = DataBaseManager::getInstance()->updatePerson(request.nameId, newPerson, false);
+		success = DataBaseManager::getInstance()->updatePerson(request.nameId, newPerson, true);
 		messageType = true == success ? OPERATION_UPDATE_SUCCESS : OPERATION_FAILED;
 
 		struct messageResponse head;

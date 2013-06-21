@@ -48,9 +48,9 @@ bool DataBaseManager::initialize()
 
     fclose(fd);
 
-    for (list<struct person>::iterator it = persons.begin(); it != persons.end(); it++){
+    /*for (list<struct person>::iterator it = persons.begin(); it != persons.end(); it++){
     	cout << it->name << ";" << it->address << ";" << it->telephone << endl;
-    }
+    }*/
 
 	return true;
 }
@@ -61,6 +61,7 @@ std::list<struct person> DataBaseManager::retrievePersons(
 		std::string addressPattern,
 		std::string phonePattern)
 {
+	//cout << "Retrieving : " << namePattern << " | " << addressPattern << " | " << phonePattern << endl;
 	bool filterByName 		= 0 != strcmp("*", namePattern.c_str());
 	bool filterByAddress 	= 0 != strcmp("*", addressPattern.c_str());
 	bool filterByPhone		= 0 != strcmp("*", phonePattern.c_str());
@@ -79,7 +80,7 @@ std::list<struct person> DataBaseManager::retrievePersons(
 		if( filterByName )
 		{
 			std::string name(iterator->name);
-			if( name.find(namePattern) )
+			if( string::npos == name.find(namePattern) )
 			{
 				iterator++;
 				continue;
@@ -88,7 +89,7 @@ std::list<struct person> DataBaseManager::retrievePersons(
 		if( filterByAddress )
 		{
 			std::string address(iterator->address);
-			if( address.find(addressPattern) )
+			if( string::npos == address.find(addressPattern) )
 			{
 				iterator++;
 				continue;
@@ -97,7 +98,7 @@ std::list<struct person> DataBaseManager::retrievePersons(
 		if( filterByPhone )
 		{
 			std::string phone(iterator->telephone);
-			if( phone.find(phonePattern) )
+			if( string::npos == phone.find(phonePattern) )
 			{
 				iterator++;
 				continue;
@@ -117,6 +118,9 @@ bool DataBaseManager::createPerson(struct person person)
 
 bool DataBaseManager::updatePerson(char *nameId, struct person person, bool createIfNeeded)
 {
+	//cout << "Updating : " << person.name << " | " << person.address << " | " << person.telephone << endl;
+	//cout << "With person Name Id : " << nameId << endl;
+
 	bool notFound = true;
 
 	std::list<struct person>::iterator personIterator =
@@ -125,16 +129,19 @@ bool DataBaseManager::updatePerson(char *nameId, struct person person, bool crea
 	{
 		struct person iteratedPerson = *personIterator;
 
-		if( 0 == strcmp(person.name, nameId) )
+		//cout << person.name << " == " << nameId << " -> ";
+		if( 0 == strcmp(personIterator->name, nameId) )
 		{
 			notFound = false;
 			strcpy(personIterator->name, person.name);
 			strcpy(personIterator->address, person.address);
 			strcpy(personIterator->telephone, person.telephone);
+			//cout << "true" << endl;
 			return true;
 		}
 		else
 		{
+			//cout << "false" << endl;
 			personIterator++;
 		}
 	}
