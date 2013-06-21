@@ -15,6 +15,9 @@
 
 #include "Concurrency/MessageQueue.h"
 
+#include "Helpers/Logger.h"
+#include "Helpers/Convert.h"
+
 using namespace std;
 
 #define READ_NEXT 0
@@ -45,19 +48,23 @@ int main(int argc, char **argv)
 
 	if( 0 == pid )
 	{
+		Logger::getInstance();
+
 		bool error;
 
 		error = prepareDataBase();
 		if( true == error )
 		{
-			cout << "prepareDataBase() error" << endl;
+			Logger::getInstance()->logMessage("prepareDataBase() error");
+			Logger::getInstance()->terminate();
 			exit(1);
 		}
 
 		error = createMessageQueues();
 		if( true == error )
 		{
-			cout << "createMessageQueues() error" << endl;
+			Logger::getInstance()->logMessage("createMessageQueues() error");
+			Logger::getInstance()->terminate();
 			remove(ASSET_REQUEST_FILE);
 			remove(ASSET_RESPONSE_FILE);
 
@@ -76,7 +83,10 @@ int main(int argc, char **argv)
 
 		if( 0 != seconds )
 		{
-			cout << "Waiting " << seconds << " seconds for clients to enqueue" << endl;
+			std::string message = "Waiting ";
+			message += Convert::toString(seconds);
+			message += " seconds for clients to enqueue";
+			Logger::getInstance()->logMessage(message);
 			sleep(seconds);
 		}
 
@@ -88,12 +98,16 @@ int main(int argc, char **argv)
 			request = checkForAdministratorRequest();
 			if( NULL_ACTION_TYPE == request.requestActionType )
 				request = readRequest();
+			Logger::getInstance()->logRequest(request);
 			responseStructures = processRequest(request);
 			sendResponse(responseStructures);
 		}
 
 		saveDataBaseChanges();
 		releaseMessageQueueResources();
+
+		Logger::getInstance()->logMessage("Gracefully quited");
+		Logger::getInstance()->terminate();
 
 		exit( 0 );
 	}
@@ -134,7 +148,7 @@ bool prepareDataBase()
 
 bool createMessageQueues()
 {
-	cout << "Creating MQs" << endl;
+	Logger::getInstance()->logMessage("Creating MQs");
 	std::ofstream stream;
 	stream.open(ASSET_REQUEST_FILE, ios::out | ios::app);
 	stream.close();
@@ -144,7 +158,7 @@ bool createMessageQueues()
 	mqRequest = new MessageQueue<struct messageRequest>(ASSET_REQUEST_FILE);
 	mqResponse = new MessageQueue<struct messageResponse>(ASSET_RESPONSE_FILE);
 
-	cout << "MQs created" << endl;
+	Logger::getInstance()->logMessage("MQs created");
 
 	return (NULL == mqRequest || NULL == mqResponse) ;
 }
@@ -152,10 +166,10 @@ bool createMessageQueues()
 
 struct messageRequest readRequest()
 {
-	cout << "Reading next Request" << endl;
+	Logger::getInstance()->logMessage("Reading next Request");
 	struct messageRequest request;
 	request = readRequestWithId(READ_NEXT);
-	cout << "Request Type: "<< request.requestActionType << endl;
+	Logger::getInstance()->logMessage("Request Type : " + Convert::toString(request.requestActionType));
 	return request;
 }
 
@@ -178,7 +192,7 @@ struct messageRequest checkForAdministratorRequest()
 
 std::list<struct messageResponse> processRequest(struct messageRequest request)
 {
-	cout << "Processing Request" << endl;
+	Logger::getInstance()->logMessage("Processing Request");
 	std::list<struct messageResponse> r;
 	struct person newPerson;
 	strcpy(newPerson.name, request.name);
@@ -209,7 +223,6 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	case UPDATE:
 	{
-		cout << "In update" << endl;
 		bool success;
 		int messageType;
 
@@ -229,7 +242,6 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	case READ:
 	{
-		cout << "In read" << endl;
 		std::list<struct person> persons = DataBaseManager::getInstance()->retrievePersons(
 				request.name, request.address, request.telephone);
 		std::list<struct person>::iterator it = persons.begin();
@@ -261,7 +273,6 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	case DELETE:
 	{
-		cout << "In delete" << endl;
 		bool success;
 		int messageType;
 
@@ -287,7 +298,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	default :
 	{
-		cout << "In default" << endl;
+		Logger::getInstance()->logMessage("Request Activity Type Unknown");
 		struct messageResponse head;
 		head.clientId = request.clientId;
 		head.responseActionType = OPERATION_UNKNOWN;
@@ -305,7 +316,10 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 
 void sendResponse(std::list<struct messageResponse> responseStructures)
 {
-	cout << "Sending Response (Count: "<< responseStructures.size()<<")" << endl;
+	std::string message = "Sending Response (Count: ";
+	message += Convert::toString(responseStructures.size());
+	message += ")";
+	Logger::getInstance()->logMessage(message);
 	std::list<struct messageResponse>::iterator it =
 		responseStructures.begin();
 	while(responseStructures.end() != it)
@@ -317,13 +331,13 @@ void sendResponse(std::list<struct messageResponse> responseStructures)
 
 void saveDataBaseChanges()
 {
-	cout << "Saving db changes" << endl;
+	Logger::getInstance()->logMessage("Saving db changes");
 	DataBaseManager::getInstance()->finalize();
 }
 
 void releaseMessageQueueResources()
 {
-	cout << "Releasing MQs resources" << endl;
+	Logger::getInstance()->logMessage("Releasing MQs resources");
 	mqRequest->destroy();
 	mqResponse->destroy();
 	delete(mqRequest);
@@ -334,7 +348,7 @@ void releaseMessageQueueResources()
 
 std::list<struct messageResponse> prepareForGracefullQuit()
 {
-	cout << "Preparing for GracefullQuit" << endl;
+	Logger::getInstance()->logMessage("Preparing for GracefullQuit");
 	// remove temp files (this way if a client wants to open a conection it stops)
 	remove(ASSET_REQUEST_FILE);
 	remove(ASSET_RESPONSE_FILE);
@@ -346,7 +360,7 @@ std::list<struct messageResponse> prepareForGracefullQuit()
 		// Prepare response for processes who are waiting for a response
 		struct messageResponse eocResponse;
 		eocResponse.clientId = request.clientId;
-		cout << "ClientId: " << eocResponse.clientId << endl;
+		Logger::getInstance()->logMessage("Message in queue from ClientId: " + eocResponse.clientId);
 		eocResponse.responseActionType = ENDOFCONNECTION;
 		eocResponse.numberOfRegisters = 0;
 		eocResponses.push_back(eocResponse);
@@ -354,7 +368,7 @@ std::list<struct messageResponse> prepareForGracefullQuit()
 	// inform the administrator that server has gracefully quit
 	struct messageResponse eocResponse;
 	eocResponse.clientId = 1;
-	cout << "ClientId (the administrator): " << 1 << endl;
+	Logger::getInstance()->logMessage("ClientId (the administrator): 1" );
 	eocResponse.responseActionType = ENDOFCONNECTION;
 	eocResponse.numberOfRegisters = 0;
 	eocResponses.push_back(eocResponse);
