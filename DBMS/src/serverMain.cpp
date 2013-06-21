@@ -66,9 +66,9 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	/*int seconds = 10;
+	int seconds = 10;
 	cout << "Waiting " << seconds << " seconds for clients to enqueue" << endl;
-	sleep(seconds);*/
+	sleep(seconds);
 
 	while( isWorking )
 	{
