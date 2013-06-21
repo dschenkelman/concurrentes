@@ -5,6 +5,7 @@
 #include <iostream>
 #include <list>
 #include <errno.h>
+#include <sys/wait.h>
 
 #include "Messages/MessageActions.h"
 #include "Messages/MessageRequest.h"
@@ -31,7 +32,7 @@ struct messageRequest readRequestWithId(int id);
 std::list<struct messageResponse> processRequest(struct messageRequest request);
 void sendResponse(std::list<struct messageResponse> responseStructures);
 
-void prepareForGracefullQuit();
+std::list<struct messageResponse> prepareForGracefullQuit();
 void saveDataBaseChanges();
 void releaseMessageQueueResources();
 
@@ -39,56 +40,90 @@ struct messageRequest checkForAdministratorRequest();
 
 int main(int argc, char **argv)
 {
+	int seconds = 0;
+	int pid = fork();
 
-	bool error;
-
-	error = prepareDataBase();
-	if( true == error )
+	if( 0 == pid )
 	{
-		cout << "prepareDataBase() error" << endl;
-		exit(1);
-	}
+		bool error;
 
-	error = createMessageQueues();
-	if( true == error )
-	{
-		cout << "createMessageQueues() error" << endl;
-		remove(ASSET_REQUEST_FILE);
-		remove(ASSET_RESPONSE_FILE);
-
-		if( NULL != mqRequest )
+		error = prepareDataBase();
+		if( true == error )
 		{
-			mqRequest->destroy();
-			delete( mqRequest );
+			cout << "prepareDataBase() error" << endl;
+			exit(1);
 		}
-		if( NULL != mqResponse )
+
+		error = createMessageQueues();
+		if( true == error )
 		{
-			mqResponse->destroy();
-			delete( mqResponse );
+			cout << "createMessageQueues() error" << endl;
+			remove(ASSET_REQUEST_FILE);
+			remove(ASSET_RESPONSE_FILE);
+
+			if( NULL != mqRequest )
+			{
+				mqRequest->destroy();
+				delete( mqRequest );
+			}
+			if( NULL != mqResponse )
+			{
+				mqResponse->destroy();
+				delete( mqResponse );
+			}
+			exit(1);
 		}
-		exit(1);
+
+		if( 0 != seconds )
+		{
+			cout << "Waiting " << seconds << " seconds for clients to enqueue" << endl;
+			sleep(seconds);
+		}
+
+		while( isWorking )
+		{
+			struct messageRequest request;
+			std::list<struct messageResponse> responseStructures;
+
+			request = checkForAdministratorRequest();
+			if( NULL_ACTION_TYPE == request.requestActionType )
+				request = readRequest();
+			responseStructures = processRequest(request);
+			sendResponse(responseStructures);
+		}
+
+		saveDataBaseChanges();
+		releaseMessageQueueResources();
+
+		exit( 0 );
 	}
-
-	int seconds = 10;
-	cout << "Waiting " << seconds << " seconds for clients to enqueue" << endl;
-	sleep(seconds);
-
-	while( isWorking )
+	else
 	{
-		struct messageRequest request;
-		std::list<struct messageResponse> responseStructures;
+		cout << "Enter any key to stop the server" << endl;
 
-		request = checkForAdministratorRequest();
-		if( NULL_ACTION_TYPE == request.requestActionType )
-			request = readRequest();
-		responseStructures = processRequest(request);
-		sendResponse(responseStructures);
+		int character = fgetc(stdin);
+
+		pid = fork();
+		if( 0 == pid )
+		{
+			//execl("./admin", "13", "-a", "-a", "-a", (char *)0);
+			char *execArgs[] = {
+					"./admin",
+					"13",
+					"-a",
+					"-a",
+					"-a",
+					0
+			};
+			execv("./admin", execArgs);
+		}
+		else
+		{
+			wait( NULL );
+			exit( 0 );
+		}
+
 	}
-
-	saveDataBaseChanges();
-	releaseMessageQueueResources();
-
-	return 0;
 }
 
 bool prepareDataBase()
@@ -246,7 +281,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	case GRACEFUL_QUIT:
 	{
-		prepareForGracefullQuit();
+		r = prepareForGracefullQuit();
 		isWorking = false;
 		break;
 	}
@@ -297,7 +332,7 @@ void releaseMessageQueueResources()
 
 }
 
-void prepareForGracefullQuit()
+std::list<struct messageResponse> prepareForGracefullQuit()
 {
 	cout << "Preparing for GracefullQuit" << endl;
 	// remove temp files (this way if a client wants to open a conection it stops)
@@ -324,7 +359,7 @@ void prepareForGracefullQuit()
 	eocResponse.numberOfRegisters = 0;
 	eocResponses.push_back(eocResponse);
 
-	sendResponse(eocResponses);
+	return eocResponses;
 }
 
 //#endif
