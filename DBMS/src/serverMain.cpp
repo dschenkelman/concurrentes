@@ -35,6 +35,8 @@ void prepareForGracefullQuit();
 void saveDataBaseChanges();
 void releaseMessageQueueResources();
 
+struct messageRequest checkForAdministratorRequest();
+
 int main(int argc, char **argv)
 {
 
@@ -64,16 +66,18 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	int seconds = 30;
+	/*int seconds = 10;
 	cout << "Waiting " << seconds << " seconds for clients to enqueue" << endl;
-	sleep(seconds);
+	sleep(seconds);*/
 
 	while( isWorking )
 	{
 		struct messageRequest request;
 		std::list<struct messageResponse> responseStructures;
 
-		request = readRequest();
+		request = checkForAdministratorRequest();
+		if( NULL_ACTION_TYPE == request.requestActionType )
+			request = readRequest();
 		responseStructures = processRequest(request);
 		sendResponse(responseStructures);
 	}
@@ -121,6 +125,16 @@ struct messageRequest readRequestWithId(int id)
 {
 	struct messageRequest r;
 	mqRequest->read(id, &r);
+	return r;
+}
+
+
+struct messageRequest checkForAdministratorRequest()
+{
+	struct messageRequest r;
+	int result = mqRequest->readWithoutBlocking(1, &r);
+	if( -1 == result )
+		r.requestActionType = NULL_ACTION_TYPE;
 	return r;
 }
 
@@ -227,7 +241,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		r.push_back(head);
 		break;
 	}
-	case ENDOFCONNECTION:
+	case GRACEFUL_QUIT:
 	{
 		prepareForGracefullQuit();
 		isWorking = false;
@@ -277,6 +291,7 @@ void releaseMessageQueueResources()
 	delete(mqRequest);
 	delete(mqResponse);
 
+
 }
 
 void prepareForGracefullQuit()
@@ -288,14 +303,21 @@ void prepareForGracefullQuit()
 
 	struct messageRequest request;
 	std::list<struct messageResponse> eocResponses;
-	while( EAGAIN != mqRequest->readWithoutBlocking(0, &request) )
+	while( -1 != mqRequest->readWithoutBlocking(0, &request) )
 	{
 		struct messageResponse eocResponse;
 		eocResponse.clientId = request.clientId;
+		cout << "ClientId: " << eocResponse.clientId << endl;
 		eocResponse.responseActionType = ENDOFCONNECTION;
 		eocResponse.numberOfRegisters = 0;
 		eocResponses.push_back(eocResponse);
 	}
+	struct messageResponse eocResponse;
+	eocResponse.clientId = 1;
+	cout << "ClientId (the administrator): " << 1 << endl;
+	eocResponse.responseActionType = ENDOFCONNECTION;
+	eocResponse.numberOfRegisters = 0;
+	eocResponses.push_back(eocResponse);
 	sendResponse(eocResponses);
 }
 

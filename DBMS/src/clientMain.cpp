@@ -19,47 +19,49 @@ using namespace std;
 
 bool packageMessageRequest(int clientId,int parametersSize, char* petitionParameters[], struct messageRequest* message);
 bool checkConnectionWithServer();
-int sendMessageRequest(struct messageRequest message, MessageQueue<struct messageRequest>* mqRequest);
-bool readMessageResponse(int clientId, MessageQueue<struct messageResponse>* mqResponse, list<struct messageResponse>* vMessagesResponses);
+int sendMessageRequest(struct messageRequest message );
+bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesResponses);
 void printMessageResponse(int requestAction,list<struct messageResponse>* vMessagesResponses);
+void releaseMessageQueuesResources();
+
+bool gracefulQuitRequested;
+MessageQueue<messageRequest>* mqRequest = NULL;
+MessageQueue<messageResponse>* mqResponse = NULL;
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	int clientId = 1;
+	int clientId = getpid();
 	messageRequest messageReq;
 
 	if (! packageMessageRequest(clientId,argc,argv,&messageReq)){
-		perror("Packaging the MessageRequest failed");
+		cout << "Packaging the MessageRequest failed" << endl;
 		exit(1);
 	}
 
 	if( checkConnectionWithServer() ){
 
-		MessageQueue<messageRequest> mqRequest(ASSET_REQUEST_FILE);
-		MessageQueue<messageResponse> mqResponse(ASSET_RESPONSE_FILE);
+		mqRequest = new MessageQueue<struct messageRequest>(ASSET_REQUEST_FILE);
+		mqResponse = new MessageQueue<struct messageResponse>(ASSET_RESPONSE_FILE);
 
-		if (sendMessageRequest(messageReq,&mqRequest) == 0){
-
+		if (sendMessageRequest(messageReq) == 0){
 			list<struct messageResponse> vMessagesResponses;
-			if ( readMessageResponse(clientId,&mqResponse,&vMessagesResponses)){
-				printMessageResponse(messageReq.requestActionType,&vMessagesResponses);
+			if ( readMessageResponse(clientId,&vMessagesResponses)){
+				if (!gracefulQuitRequested){
+					printMessageResponse(messageReq.requestActionType,&vMessagesResponses);
+				}
 			}else{
-				perror("ReadMessageResponse failed");
-				exit(1);
+				cout << "ReadMessageRequest failed" << endl;
 			}
-
 		}else{
-			perror("SendMessageRequest failed");
-			exit(1);
+			cout << "SendMessageRequest failed" << endl;
 		}
 
 	}else{
-		perror("Connection with server couldn't be established");
-		exit(1);
+		cout << "Connection with server couldn't be established" << endl;
 	}
 
-
+	releaseMessageQueuesResources();
 
 	return 0;
 }
@@ -69,7 +71,7 @@ bool packageMessageRequest(int clientId,int parametersSize, char* petitionParame
 	if ( parametersSize < 5 ){
 		return false;
 	}else{
-		message->clientId = clientId;
+		message->clientId = Convert::toInt(petitionParameters[1]) == GRACEFUL_QUIT ? 1 : clientId;
 		message->requestActionType = Convert::toInt(petitionParameters[1]);
 		strcpy ( message->name, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[2]);
 		strcpy ( message->address, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[3] );
@@ -90,32 +92,34 @@ bool checkConnectionWithServer(){
 	return ( (stat (ASSET_REQUEST_FILE, &bufferRequest) == 0) && (stat (ASSET_RESPONSE_FILE, &bufferResponse) == 0) );
 }
 
-int sendMessageRequest(struct messageRequest message, MessageQueue<struct messageRequest>* mqRequest){
+int sendMessageRequest(struct messageRequest message){
+	gracefulQuitRequested = (message.requestActionType == GRACEFUL_QUIT);
 	return (mqRequest->write(message));
 }
 
-bool readMessageResponse(int clientId, MessageQueue<struct messageResponse>* mqResponse, list<struct messageResponse>* vMessagesResponses){
+bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesResponses){
 
 	messageResponse msgFirstResponse;
-	mqResponse->read(clientId,&msgFirstResponse);
-
+	int idRead = gracefulQuitRequested ? 1 : clientId;
+	int result = mqResponse->read(idRead,&msgFirstResponse);
+	if ( -1 == result ){
+		return false;
+	}
 	switch(msgFirstResponse.responseActionType){
 	case HEAD:
 		for(int i = 0; i < msgFirstResponse.numberOfRegisters; i++){
 			messageResponse msgResponse;
-			mqResponse->read(clientId,&msgResponse);
-			if ( msgResponse.responseActionType == ENDOFCONNECTION ){
-				cout << "Server has shut down" << endl;
+			result = mqResponse->read(clientId,&msgResponse);
+			if ( -1 == result ){
 				return false;
 			}
 			vMessagesResponses->push_back(msgResponse);
+			if ( (msgResponse.responseActionType == ENDOFCONNECTION) /*|| (msgResponse.responseActionType > NULL_ACTION_TYPE) */){
+				break;
+			}
 		}
-
 		break;
 
-	case ENDOFCONNECTION:
-		cout << "Server has shut down" << endl;
-		return false;
 	default:
 		vMessagesResponses->push_back(msgFirstResponse);
 		break;
@@ -133,22 +137,60 @@ void printMessageResponse(int requestAction, list<struct messageResponse>* vMess
 	ResponsesStringTable[OPERATION_UPDATE_SUCCESS] = "Update operation was successful";
 	ResponsesStringTable[OPERATION_DELETE_SUCCESS] = "Delete operation was successful";
 	ResponsesStringTable[OPERATION_UNKNOWN] = "Unknown operation. Please retry";
+	ResponsesStringTable[ENDOFCONNECTION] = "Server has shut down.";
 
-	if ( requestAction == READ ){
-	  for (list<struct messageResponse>::iterator it = vMessagesResponses->begin(); it != vMessagesResponses->end(); it++){
+	for (list<struct messageResponse>::iterator it = vMessagesResponses->begin(); it != vMessagesResponses->end(); it++){
+		cout << "Action Type: " << it->responseActionType << endl;
+		switch(it->responseActionType){
+		case BODY: //Read response
+			cout << it->name << endl;
+			cout << "\t" << it->address << endl;
+			cout << "\t" << it->telephone << endl;
+			cout << "-------------------" << endl;
+			break;
+		default:
+			if ( 1 == ResponsesStringTable.count(it->responseActionType) ){
+				cout << ResponsesStringTable[vMessagesResponses->begin()->responseActionType] << endl;
+			}else{
+				cout << ResponsesStringTable[OPERATION_UNKNOWN] << endl;
+			}
+			break;
+		}
+	}
 
-		  if ( it->responseActionType == OPERATION_FAILED){
-			  cout << ResponsesStringTable[OPERATION_FAILED] << endl;
-		  }
-		  cout << it->name << endl;
-		  cout << "\t" << it->address << endl;
-		  cout << "\t" << it->telephone << endl;
-		  cout << "-------------------" << endl;
-	  }
+
+	/*if ( requestAction == READ ){
+		if ((vMessagesResponses->begin()->responseActionType) || (vMessagesResponses->begin()->responseActionType > NULL_ACTION_TYPE)){
+			cout << ResponsesStringTable[ENDOFCONNECTION] << endl;
+		}else{
+			for (list<struct messageResponse>::iterator it = vMessagesResponses->begin(); it != vMessagesResponses->end(); it++){
+
+			  if ( it->responseActionType == OPERATION_FAILED){
+				  cout << ResponsesStringTable[OPERATION_FAILED] << endl;
+				  break;
+			  }
+			  cout << it->name << endl;
+			  cout << "\t" << it->address << endl;
+			  cout << "\t" << it->telephone << endl;
+			  cout << "-------------------" << endl;
+			}
+		}
+
   }else{
+	  if (vMessagesResponses->begin()->responseActionType > NULL_ACTION_TYPE){
+		  cout << ResponsesStringTable[ENDOFCONNECTION] << endl;
+	  }
 	  cout << ResponsesStringTable[vMessagesResponses->begin()->responseActionType] << endl;
-  }
+  }*/
 
+}
+
+void releaseMessageQueuesResources(){
+	cout << "Releasing MQs resources" << endl;
+	/*mqRequest->destroy();
+	mqResponse->destroy();*/
+	delete(mqRequest);
+	delete(mqResponse);
 }
 
 #endif

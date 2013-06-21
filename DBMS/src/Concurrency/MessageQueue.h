@@ -55,7 +55,7 @@ template <class T> int MessageQueue<T> :: read ( int type,T* buffer ) {
 
 template <class T> int MessageQueue<T> :: readWithoutBlocking ( int type,T* buffer )
 {
-	int result = msgrcv ( this->id,(void *)buffer,sizeof(T)-sizeof(long),type, O_NONBLOCK);
+	int result = msgrcv ( this->id,(void *)buffer,sizeof(T)-sizeof(long),type, IPC_NOWAIT);
 	return result;
 }
 

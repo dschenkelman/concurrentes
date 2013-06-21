@@ -175,7 +175,7 @@ bool DataBaseManager::deletePerson(struct person person)
 bool DataBaseManager::finalize()
 {
 	FILE * fd;
-	fd = fopen ("file.txt","w+");
+	fd = fopen (this->dbFile.c_str(),"w+");
 
 	if (fd == NULL){
 		perror("Database couldn't be found or read");
@@ -183,7 +183,7 @@ bool DataBaseManager::finalize()
 	}
 
 	for (list<struct person>::iterator it = persons.begin(); it != persons.end(); it++){
-		fprintf (fd, "%s;%s;%s", it->name, it->address, it->telephone);
+		fprintf (fd, "%s;%s;%s\n", it->name, it->address, it->telephone);
 	}
 
 	fclose (fd);
