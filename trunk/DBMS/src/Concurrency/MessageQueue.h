@@ -39,6 +39,18 @@ template <class T> MessageQueue<T> :: ~MessageQueue () {
 }
 
 template <class T> int MessageQueue<T> :: destroy () {
+
+	//Wait for all messages been read.
+	int rc = 0;
+	uint numberOfMessagesInMQ = 1;
+	while ( (numberOfMessagesInMQ != 0)&&(-1 != rc) ){
+		struct msqid_ds buf;
+		rc = msgctl(this->id, IPC_STAT, &buf);
+		numberOfMessagesInMQ = (uint)(buf.msg_qnum);
+	}
+
+
+	//Destroy MQ
 	int result = msgctl ( this->id,IPC_RMID,NULL );
 	return result;
 }

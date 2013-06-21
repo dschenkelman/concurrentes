@@ -158,37 +158,9 @@ void printMessageResponse(int requestAction, list<struct messageResponse>* vMess
 		}
 	}
 
-
-	/*if ( requestAction == READ ){
-		if ((vMessagesResponses->begin()->responseActionType) || (vMessagesResponses->begin()->responseActionType > NULL_ACTION_TYPE)){
-			cout << ResponsesStringTable[ENDOFCONNECTION] << endl;
-		}else{
-			for (list<struct messageResponse>::iterator it = vMessagesResponses->begin(); it != vMessagesResponses->end(); it++){
-
-			  if ( it->responseActionType == OPERATION_FAILED){
-				  cout << ResponsesStringTable[OPERATION_FAILED] << endl;
-				  break;
-			  }
-			  cout << it->name << endl;
-			  cout << "\t" << it->address << endl;
-			  cout << "\t" << it->telephone << endl;
-			  cout << "-------------------" << endl;
-			}
-		}
-
-  }else{
-	  if (vMessagesResponses->begin()->responseActionType > NULL_ACTION_TYPE){
-		  cout << ResponsesStringTable[ENDOFCONNECTION] << endl;
-	  }
-	  cout << ResponsesStringTable[vMessagesResponses->begin()->responseActionType] << endl;
-  }*/
-
 }
 
 void releaseMessageQueuesResources(){
-	cout << "Releasing MQs resources" << endl;
-	/*mqRequest->destroy();
-	mqResponse->destroy();*/
 	delete(mqRequest);
 	delete(mqResponse);
 }
