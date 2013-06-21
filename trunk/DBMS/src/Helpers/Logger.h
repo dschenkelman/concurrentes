@@ -20,12 +20,15 @@
 class Logger
 {
 public:
-	Logger *getInstance();
+	static Logger *getInstance();
+	static void terminate();
+	virtual ~Logger();
+
 	void setLogEnable(bool enable);
 	bool isLogEnable();
+
 	void logMessage(std::string message);
 	void logRequest(struct messageRequest request);
-	virtual ~Logger();
 
 protected:
 	Logger();
@@ -34,6 +37,9 @@ private:
 	static Logger *instance;
 
 	bool loggingEnable;
+	time_t rawtime;
+	std::ofstream file;
+	std::string name;
 };
 
 #endif /* LOGGER_H_ */
