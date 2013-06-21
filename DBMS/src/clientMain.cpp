@@ -74,8 +74,8 @@ bool packageMessageRequest(int clientId,int parametersSize, char* petitionParame
 		message->clientId = Convert::toInt(petitionParameters[1]) == GRACEFUL_QUIT ? 1 : clientId;
 		message->requestActionType = Convert::toInt(petitionParameters[1]);
 		strcpy ( message->name, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[2]);
-		strcpy ( message->address, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[3] );
-		strcpy ( message->telephone, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[4] );
+		strcpy ( message->address, 0 == strcmp(petitionParameters[3],"-a") ? "*" : petitionParameters[3] );
+		strcpy ( message->telephone, 0 == strcmp(petitionParameters[4],"-a") ? "*" : petitionParameters[4] );
 		if ( parametersSize > 5 ){
 			strcpy ( message->nameId, petitionParameters[5] );
 		}else{
