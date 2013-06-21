@@ -154,9 +154,12 @@ public class ClientUI extends JFrame{
 				try 
 				{ 
 					int actionId = ((RequestActionType)requestActionCombo.getSelectedItem()).getId();
-					String namePattern = patternFieldName.getText();
-					String addressPattern = patternFieldAddress.getText();
-					String phonePattern = patternFieldPhone.getText();
+					String namePattern = patternFieldName.getText().length() == 0 ? "-a" :
+						patternFieldName.getText();
+					String addressPattern = patternFieldAddress.getText().length() == 0 ? "-a" :
+						patternFieldAddress.getText();
+					String phonePattern = patternFieldPhone.getText().length() == 0 ? "-a" :
+						patternFieldPhone.getText();
 					
 					/* directorio/ejecutable es el path del ejecutable y un nombre */ 
 					String arguments[] = {"./admin", actionId + "", namePattern, addressPattern, phonePattern, null};
