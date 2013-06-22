@@ -98,9 +98,9 @@ int sendMessageRequest(struct messageRequest message){
 }
 
 bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesResponses){
-
 	messageResponse msgFirstResponse;
 	int idRead = GracefulQuitRequested ? 1 : clientId;
+
 	int result = MQResponse->read(idRead,&msgFirstResponse);
 	if ( -1 == result ){
 		return false;
@@ -133,14 +133,17 @@ void printMessageResponse(int requestAction, list<struct messageResponse>* vMess
 
 	map<int, string> ResponsesStringTable;
 	ResponsesStringTable[OPERATION_FAILED] = "The requested operation has failed";
+	ResponsesStringTable[ENDOFCONNECTION] = "Server has shut down";
 	ResponsesStringTable[OPERATION_CREATE_SUCCESS] = "Create operation was successful";
+	ResponsesStringTable[OPERATION_CREATE_FAIL_PERSON_EXISTS] = "Create operation failed. The person already exists";
 	ResponsesStringTable[OPERATION_UPDATE_SUCCESS] = "Update operation was successful";
+	ResponsesStringTable[OPERATION_UPDATE_FAIL_PERSON_EXISTS] = "Update operation failed. The new name belongs to a person that already exists";
+	ResponsesStringTable[OPERATION_UPDATE_FAIL_PERSON_NOT_EXISTS] = "Update operation failed. The person does not exists";
 	ResponsesStringTable[OPERATION_DELETE_SUCCESS] = "Delete operation was successful";
+	ResponsesStringTable[OPERATION_DELETE_FAIL_PERSON_NOT_EXISTS] = "Delete operation failed. The person does not exists";
 	ResponsesStringTable[OPERATION_UNKNOWN] = "Unknown operation. Please retry";
-	ResponsesStringTable[ENDOFCONNECTION] = "Server has shut down.";
 
 	for (list<struct messageResponse>::iterator it = vMessagesResponses->begin(); it != vMessagesResponses->end(); it++){
-		cout << "Action Type: " << it->responseActionType << endl;
 		switch(it->responseActionType){
 		case BODY: //Read response
 			cout << it->name << endl;

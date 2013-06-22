@@ -1,7 +1,7 @@
 //#ifdef MAIN_SERVER
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <list>
 #include <errno.h>
@@ -120,10 +120,12 @@ int main(int argc, char **argv)
 		pid = fork();
 		if( 0 == pid )
 		{
-			//execl("./admin", "13", "-a", "-a", "-a", (char *)0);
+			char gracefulQuit[6];
+			snprintf(gracefulQuit, sizeof(gracefulQuit), "%d", GRACEFUL_QUIT);
+
 			char *execArgs[] = {
 					"./admin",
-					"13",
+					gracefulQuit,
 					"-a",
 					"-a",
 					"-a",
@@ -136,7 +138,6 @@ int main(int argc, char **argv)
 			wait( NULL );
 			exit( 0 );
 		}
-
 	}
 }
 
@@ -193,7 +194,7 @@ struct messageRequest checkForAdministratorRequest()
 std::list<struct messageResponse> processRequest(struct messageRequest request)
 {
 	Logger::getInstance()->logMessage("Processing Request");
-	std::list<struct messageResponse> r;
+	std::list<struct messageResponse> messageResponseList;
 	struct person newPerson;
 	strcpy(newPerson.name, request.name);
 	strcpy(newPerson.address, request.address);
@@ -203,12 +204,9 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	{
 	case CREATE:
 	{
-		cout << "In create" << endl;
-		bool success;
 		int messageType;
 
-		success = DataBaseManager::getInstance()->createPerson(newPerson);
-		messageType = true == success ? OPERATION_CREATE_SUCCESS : OPERATION_FAILED;
+		messageType = DataBaseManager::getInstance()->createPerson(newPerson);
 
 		struct messageResponse head;
 		head.clientId = request.clientId;
@@ -218,16 +216,14 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		strcpy(head.address, newPerson.address);
 		strcpy(head.telephone, newPerson.telephone);
 
-		r.push_back(head);
+		messageResponseList.push_back(head);
 		break;
 	}
 	case UPDATE:
 	{
-		bool success;
 		int messageType;
 
-		success = DataBaseManager::getInstance()->updatePerson(request.nameId, newPerson, true);
-		messageType = true == success ? OPERATION_UPDATE_SUCCESS : OPERATION_FAILED;
+		messageType = DataBaseManager::getInstance()->updatePerson(request.nameId, newPerson, false);
 
 		struct messageResponse head;
 		head.clientId = request.clientId;
@@ -237,7 +233,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		strcpy(head.address, newPerson.address);
 		strcpy(head.telephone, newPerson.telephone);
 
-		r.push_back(head);
+		messageResponseList.push_back(head);
 		break;
 	}
 	case READ:
@@ -254,7 +250,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		strcpy(head.address, newPerson.address);
 		strcpy(head.telephone, newPerson.telephone);
 
-		r.push_back(head);
+		messageResponseList.push_back(head);
 
 		while( persons.end() != it )
 		{
@@ -266,7 +262,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 			strcpy(body.address, it->address);
 			strcpy(body.telephone, it->telephone);
 
-			r.push_back(body);
+			messageResponseList.push_back(body);
 			it++;
 		}
 		break;
@@ -276,8 +272,7 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		bool success;
 		int messageType;
 
-		success = DataBaseManager::getInstance()->deletePerson(newPerson);
-		messageType = true == success ? OPERATION_DELETE_SUCCESS : OPERATION_FAILED;
+		messageType = DataBaseManager::getInstance()->deletePerson(newPerson);
 
 		struct messageResponse head;
 		head.clientId = request.clientId;
@@ -287,12 +282,12 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		strcpy(head.address, newPerson.address);
 		strcpy(head.telephone, newPerson.telephone);
 
-		r.push_back(head);
+		messageResponseList.push_back(head);
 		break;
 	}
 	case GRACEFUL_QUIT:
 	{
-		r = prepareForGracefullQuit();
+		messageResponseList = prepareForGracefullQuit();
 		isWorking = false;
 		break;
 	}
@@ -307,11 +302,11 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 		strcpy(head.address, newPerson.address);
 		strcpy(head.telephone, newPerson.telephone);
 
-		r.push_back(head);
+		messageResponseList.push_back(head);
 		break;
 	}
 	}
-	return r;
+	return messageResponseList;
 }
 
 void sendResponse(std::list<struct messageResponse> responseStructures)
@@ -342,6 +337,7 @@ void releaseMessageQueueResources()
 	mqResponse->destroy();
 	delete(mqRequest);
 	delete(mqResponse);
+	Logger::getInstance()->logMessage("Releasing finished");
 
 
 }

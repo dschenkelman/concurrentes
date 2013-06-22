@@ -16,6 +16,7 @@
 #include <stdio.h>
 
 #include "PersonRegister.h"
+#include "../Messages/MessageActions.h"
 
 class DataBaseManager
 {
@@ -30,9 +31,9 @@ public:
 			std::string addressPattern,
 			std::string phonePattern);
 
-	bool createPerson(struct person person);
-	bool updatePerson(char *nameId, struct person person, bool createIfNeeded);
-	bool deletePerson(struct person person);
+	int createPerson(struct person person);
+	int updatePerson(char *nameId, struct person person, bool createIfNeeded);
+	int deletePerson(struct person person);
 
 	bool finalize();
 
@@ -40,6 +41,7 @@ protected:
 	DataBaseManager();
 
 private:
+	bool  personExists(char personName[SIZE_NAME]);
 	std::list<struct person> persons;
 	static DataBaseManager *instance;
 	static const std::string dbFile;

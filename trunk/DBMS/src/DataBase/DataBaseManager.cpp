@@ -110,17 +110,18 @@ std::list<struct person> DataBaseManager::retrievePersons(
 	return filteredPersons;
 }
 
-bool DataBaseManager::createPerson(struct person person)
+int DataBaseManager::createPerson(struct person person)
 {
+	if ( this->personExists(person.name) ){
+		//Can't create a person with a name that already exists.
+		return OPERATION_CREATE_FAIL_PERSON_EXISTS;
+	}
 	persons.push_back(person);
-	return true;
+	return OPERATION_CREATE_SUCCESS;
 }
 
-bool DataBaseManager::updatePerson(char *nameId, struct person person, bool createIfNeeded)
+int DataBaseManager::updatePerson(char *nameId, struct person person, bool createIfNeeded)
 {
-	//cout << "Updating : " << person.name << " | " << person.address << " | " << person.telephone << endl;
-	//cout << "With person Name Id : " << nameId << endl;
-
 	bool notFound = true;
 
 	std::list<struct person>::iterator personIterator =
@@ -133,27 +134,27 @@ bool DataBaseManager::updatePerson(char *nameId, struct person person, bool crea
 		if( 0 == strcmp(personIterator->name, nameId) )
 		{
 			notFound = false;
+
+			if ( this->personExists(person.name) ){
+				//Can't update name to a name that already exists.
+				return OPERATION_UPDATE_FAIL_PERSON_EXISTS;
+			}
 			strcpy(personIterator->name, person.name);
 			strcpy(personIterator->address, person.address);
 			strcpy(personIterator->telephone, person.telephone);
 			//cout << "true" << endl;
-			return true;
+			return OPERATION_UPDATE_SUCCESS;
 		}
 		else
 		{
-			//cout << "false" << endl;
 			personIterator++;
 		}
 	}
-	if( notFound && createIfNeeded )
-	{
-		persons.push_back(person);
-		return true;
-	}
-	return false;
+
+	return OPERATION_UPDATE_FAIL_PERSON_NOT_EXISTS;
 }
 
-bool DataBaseManager::deletePerson(struct person person)
+int DataBaseManager::deletePerson(struct person person)
 {
 	bool notFound = true;
 
@@ -171,12 +172,29 @@ bool DataBaseManager::deletePerson(struct person person)
 			personIterator++;
 		}
 	}
-	if( false == notFound )
-	{
-		persons.erase(personIterator);
-		return true;
+
+	if ( notFound ){
+		return OPERATION_DELETE_FAIL_PERSON_NOT_EXISTS;
 	}
-	return false;
+
+	persons.erase(personIterator);
+	return OPERATION_DELETE_SUCCESS;
+
+}
+
+bool  DataBaseManager::personExists(char personName[SIZE_NAME])
+{
+	bool personExists = false;
+
+	for (list<struct person>::iterator it = persons.begin(); it != persons.end(); it++){
+		if( 0 == strcmp(it->name, personName) )
+		{
+			personExists = true;
+			break;
+		}
+	}
+
+	return personExists;
 }
 
 bool DataBaseManager::finalize()
