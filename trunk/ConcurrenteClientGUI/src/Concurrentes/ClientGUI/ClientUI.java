@@ -1,12 +1,13 @@
-package Concurrentes.ClientGUI;
-
+package concu.clientUI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ConvolveOp;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Vector;
@@ -69,6 +70,13 @@ public class ClientUI extends JFrame{
 
 		final JTextField patternFieldPhone = new JTextField(40);
 		container.add(patternFieldPhone);
+
+		JLabel patternTitleNameId = new JLabel("Name (id):");
+		patternTitleNameId.setHorizontalAlignment(SwingConstants.RIGHT);
+		container.add(patternTitleNameId);
+
+		final JTextField patternFieldNameId = new JTextField(40);
+		container.add(patternFieldNameId);
 		
 		JLabel requestTypeTitle = new JLabel("Request type:");
 		container.add(requestTypeTitle);
@@ -82,7 +90,7 @@ public class ClientUI extends JFrame{
 		requestActions.add(RequestActionType.CREATE);
 		requestActions.add(RequestActionType.UPDATE);
 		requestActions.add(RequestActionType.DELETE);
-		final JComboBox<RequestActionType> requestActionCombo = new JComboBox<RequestActionType>(requestActions);
+		final JComboBox requestActionCombo = new JComboBox(requestActions);
 		container.add(requestActionCombo);
 		
 		JButton searchButton = new JButton("Request");
@@ -104,17 +112,20 @@ public class ClientUI extends JFrame{
 					.addComponent(title)
 					.addComponent(searchTitle)
 					.addGroup(layout.createSequentialGroup()
-						.addComponent(patternTitleName)//, 80, 80, 80)
+						.addComponent(patternTitleName)
 						.addComponent(patternFieldName))
 					.addGroup(layout.createSequentialGroup()
-						.addComponent(patternTitleAddress)//, 80, 80, 80)
+						.addComponent(patternTitleAddress)
 						.addComponent(patternFieldAddress))
 					.addGroup(layout.createSequentialGroup()
-						.addComponent(patternTitlePhone)//, 80, 80, 80)
+						.addComponent(patternTitlePhone)
 						.addComponent(patternFieldPhone))
 					.addGroup(layout.createSequentialGroup()
+						.addComponent(patternTitleNameId)
+						.addComponent(patternFieldNameId))
+					.addGroup(layout.createSequentialGroup()
 						.addComponent(requestActionTitle)
-						.addComponent(requestActionCombo)//, 80, 80, 80)
+						.addComponent(requestActionCombo)
 						.addComponent(searchButton))
 					.addComponent(responseArea)
 				);
@@ -133,16 +144,20 @@ public class ClientUI extends JFrame{
 						.addComponent(patternTitlePhone)
 						.addComponent(patternFieldPhone))
 					.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addComponent(patternTitleNameId)
+						.addComponent(patternFieldNameId))
+					.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addComponent(requestActionTitle)
 						.addComponent(requestActionCombo)
 						.addComponent(searchButton))
 					.addComponent(responseArea)
 				);
 		
-		layout.linkSize(SwingConstants.HORIZONTAL, patternTitleName, patternTitleAddress, patternTitlePhone, requestActionTitle);
+		layout.linkSize(SwingConstants.HORIZONTAL, patternTitleName, patternTitleAddress, patternTitlePhone, patternTitleNameId, requestActionTitle);
 		layout.linkSize(SwingConstants.VERTICAL, patternTitleName, patternFieldName);
 		layout.linkSize(SwingConstants.VERTICAL, patternTitleAddress, patternFieldAddress);
 		layout.linkSize(SwingConstants.VERTICAL, patternTitlePhone, patternFieldPhone);
+		layout.linkSize(SwingConstants.VERTICAL, patternTitleNameId, patternFieldNameId);
 
 		layout.linkSize(SwingConstants.VERTICAL, requestActionCombo, searchButton);
 		
@@ -160,15 +175,18 @@ public class ClientUI extends JFrame{
 						patternFieldAddress.getText();
 					String phonePattern = patternFieldPhone.getText().length() == 0 ? "-a" :
 						patternFieldPhone.getText();
+					String nameIdPattern = patternFieldNameId.getText();
 					
-					/* directorio/ejecutable es el path del ejecutable y un nombre */ 
-					String arguments[] = {"./admin", actionId + "", namePattern, addressPattern, phonePattern, null};
-					Process p = Runtime.getRuntime().exec("./admin", arguments); 
+					Process p = Runtime.getRuntime().exec(new String[] {
+							"./client", actionId + "",
+							namePattern, addressPattern, phonePattern, nameIdPattern
+					});
+					//Process p = Runtime.getRuntime().exec(command);//, arguments); 
 					
 					// Se obtiene el stream de salida del programa 
 		            InputStream is = p.getInputStream(); 
 		             
-		            /* Se prepara un bufferedReader para poder leer la salida más comodamente. */ 
+		            /* Se prepara un bufferedReader para poder leer la salida mï¿½s comodamente. */ 
 		            BufferedReader br = new BufferedReader (new InputStreamReader (is)); 
 		             
 		            // Se lee la primera linea 
@@ -178,15 +196,23 @@ public class ClientUI extends JFrame{
 		            while (aux!=null) 
 		            { 
 		                // Se escribe la linea en pantalla 
-		            	responseArea.append(aux);
+		            	responseArea.append(aux + "\n");
 		                 
 		                // y se lee la siguiente. 
 		                aux = br.readLine(); 
 		            } 
+		            
+		            patternFieldName.setText("");
+		            patternFieldAddress.setText("");
+		            patternFieldPhone.setText("");
+		            patternFieldNameId.setText("");
+		            requestActionCombo.setSelectedIndex(0);
 				} 
 				catch (Exception e) 
 				{ 
-					/* Se lanza una excepción si no se encuentra en ejecutable o el fichero no es ejecutable. */ 
+					System.err.println(e);
+	            	responseArea.append(e + "\n");
+	            	responseArea.append("PWD = " + new File(".").getAbsolutePath() + "\n");
 				}
 			}
 		});
