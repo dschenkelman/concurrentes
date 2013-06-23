@@ -130,19 +130,17 @@ int DataBaseManager::updatePerson(char *nameId, struct person person, bool creat
 	{
 		struct person iteratedPerson = *personIterator;
 
-		//cout << person.name << " == " << nameId << " -> ";
 		if( 0 == strcmp(personIterator->name, nameId) )
 		{
 			notFound = false;
 
-			if ( this->personExists(person.name) ){
+			if ( (this->personExists(person.name)) && (0 != strcmp(personIterator->name, person.name)) ){
 				//Can't update name to a name that already exists.
 				return OPERATION_UPDATE_FAIL_PERSON_EXISTS;
 			}
 			strcpy(personIterator->name, person.name);
 			strcpy(personIterator->address, person.address);
 			strcpy(personIterator->telephone, person.telephone);
-			//cout << "true" << endl;
 			return OPERATION_UPDATE_SUCCESS;
 		}
 		else
