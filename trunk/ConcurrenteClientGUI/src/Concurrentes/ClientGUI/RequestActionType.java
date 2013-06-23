@@ -1,4 +1,4 @@
-package concu.clientUI;
+package Concurrentes.ClientGUI;
 
 public enum RequestActionType {
 	CREATE("Create",1),UPDATE("Update", 2),

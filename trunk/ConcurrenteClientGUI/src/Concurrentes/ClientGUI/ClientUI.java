@@ -1,7 +1,8 @@
-package concu.clientUI;
+package Concurrentes.ClientGUI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,12 +31,12 @@ public class ClientUI extends JFrame{
 
 	public ClientUI()
 	{
-		Dimension dimention = Toolkit.getDefaultToolkit().getScreenSize();
+		//Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 		int windowBorder = 100;
-		
-		setBounds(windowBorder,windowBorder,dimention.width - 2 * windowBorder, dimention.height - 2 * windowBorder);
+		setLocationRelativeTo(null);
+		setBounds(windowBorder,windowBorder,640,600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTitle("InfoFutbol 2.0 - Administrador de datos");
+		setTitle("DBMS Client");
 		
 		setResizable(false);
 		setVisible(true);
@@ -99,6 +100,9 @@ public class ClientUI extends JFrame{
 		final JTextArea responseArea = new JTextArea(20,50);
 		responseArea.setEditable(false);
 		responseArea.setBorder(BorderFactory.createLineBorder(Color.black));
+		responseArea.setFont(new Font("Verdana", Font.BOLD, 12));
+		responseArea.setForeground(new Color(21,65,181));
+		
 		container.add(responseArea);
 		
 		GroupLayout layout = new GroupLayout(container);
@@ -168,6 +172,7 @@ public class ClientUI extends JFrame{
 			{
 				try 
 				{ 
+					responseArea.setText("");
 					int actionId = ((RequestActionType)requestActionCombo.getSelectedItem()).getId();
 					String namePattern = patternFieldName.getText().length() == 0 ? "-a" :
 						patternFieldName.getText();
@@ -186,7 +191,7 @@ public class ClientUI extends JFrame{
 					// Se obtiene el stream de salida del programa 
 		            InputStream is = p.getInputStream(); 
 		             
-		            /* Se prepara un bufferedReader para poder leer la salida m�s comodamente. */ 
+		            /* Se prepara un bufferedReader para poder leer la salida mas comodamente. */ 
 		            BufferedReader br = new BufferedReader (new InputStreamReader (is)); 
 		             
 		            // Se lee la primera linea 
