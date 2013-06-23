@@ -1,4 +1,4 @@
-#ifdef MAIN_CLIENT
+//#ifdef MAIN_CLIENT
 
 #include <iostream>
 #include <stdlib.h>
@@ -107,15 +107,19 @@ bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesRe
 	}
 	switch(msgFirstResponse.responseActionType){
 	case HEAD:
-		for(int i = 0; i < msgFirstResponse.numberOfRegisters; i++){
-			messageResponse msgResponse;
-			result = MQResponse->read(clientId,&msgResponse);
-			if ( -1 == result ){
-				return false;
-			}
-			vMessagesResponses->push_back(msgResponse);
-			if ( (msgResponse.responseActionType == ENDOFCONNECTION) /*|| (msgResponse.responseActionType > NULL_ACTION_TYPE) */){
-				break;
+		if (0 == msgFirstResponse.numberOfRegisters){
+			vMessagesResponses->push_back(msgFirstResponse);
+		}else{
+			for(int i = 0; i < msgFirstResponse.numberOfRegisters; i++){
+				messageResponse msgResponse;
+				result = MQResponse->read(clientId,&msgResponse);
+				if ( -1 == result ){
+					return false;
+				}
+				vMessagesResponses->push_back(msgResponse);
+				if ( (msgResponse.responseActionType == ENDOFCONNECTION) /*|| (msgResponse.responseActionType > NULL_ACTION_TYPE) */){
+					break;
+				}
 			}
 		}
 		break;
@@ -129,8 +133,6 @@ bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesRe
 }
 
 void printMessageResponse(int requestAction, list<struct messageResponse>* vMessagesResponses){
-	cout << "Server Response:" << endl << endl;
-
 	map<int, string> ResponsesStringTable;
 	ResponsesStringTable[OPERATION_FAILED] = "The requested operation has failed";
 	ResponsesStringTable[ENDOFCONNECTION] = "Server has shut down";
@@ -142,6 +144,7 @@ void printMessageResponse(int requestAction, list<struct messageResponse>* vMess
 	ResponsesStringTable[OPERATION_DELETE_SUCCESS] = "Delete operation was successful";
 	ResponsesStringTable[OPERATION_DELETE_FAIL_PERSON_NOT_EXISTS] = "Delete operation failed. The person does not exists";
 	ResponsesStringTable[OPERATION_UNKNOWN] = "Unknown operation. Please retry";
+	ResponsesStringTable[HEAD] = "No person registers matched";
 
 	for (list<struct messageResponse>::iterator it = vMessagesResponses->begin(); it != vMessagesResponses->end(); it++){
 		switch(it->responseActionType){
@@ -149,7 +152,7 @@ void printMessageResponse(int requestAction, list<struct messageResponse>* vMess
 			cout << it->name << endl;
 			cout << "\t" << it->address << endl;
 			cout << "\t" << it->telephone << endl;
-			cout << "-------------------" << endl;
+			cout << endl;
 			break;
 		default:
 			if ( 1 == ResponsesStringTable.count(it->responseActionType) ){
@@ -168,4 +171,4 @@ void releaseMessageQueuesResources(){
 	delete(MQResponse);
 }
 
-#endif
+//#endif

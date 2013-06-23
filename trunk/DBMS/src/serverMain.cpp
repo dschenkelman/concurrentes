@@ -1,4 +1,4 @@
-//#ifdef MAIN_SERVER
+#ifdef MAIN_SERVER
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -372,4 +372,4 @@ std::list<struct messageResponse> prepareForGracefullQuit()
 	return eocResponses;
 }
 
-//#endif
+#endif
