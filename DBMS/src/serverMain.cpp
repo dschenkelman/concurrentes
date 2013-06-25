@@ -44,6 +44,10 @@ struct messageRequest checkForAdministratorRequest();
 int main(int argc, char **argv)
 {
 	int seconds = 0;
+	if (argc > 1){
+		seconds = Convert::toInt(argv[1]);
+	}
+
 	int pid = fork();
 
 	if( 0 == pid )
@@ -115,7 +119,8 @@ int main(int argc, char **argv)
 	{
 		cout << "Enter any key to stop the server" << endl;
 
-		int character = fgetc(stdin);
+		//int character = fgetc(stdin);
+		fgetc(stdin);
 
 		pid = fork();
 		if( 0 == pid )
@@ -269,7 +274,6 @@ std::list<struct messageResponse> processRequest(struct messageRequest request)
 	}
 	case DELETE:
 	{
-		bool success;
 		int messageType;
 
 		messageType = DataBaseManager::getInstance()->deletePerson(newPerson);

@@ -75,9 +75,13 @@ bool packageMessageRequest(int clientId,int parametersSize, char* petitionParame
 		message->requestActionType = Convert::toInt(petitionParameters[1]);
 		strcpy ( message->name, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[2]);
 
-		if ( (parametersSize < 4)&&((message->requestActionType!=DELETE)&&(message->requestActionType!=ENDOFCONNECTION))){
+		if ( (parametersSize < 5)&&((message->requestActionType!=DELETE)&&(message->requestActionType!=GRACEFUL_QUIT))){
 			return false;
 		}
+		if ( (parametersSize < 6)&&(message->requestActionType==UPDATE) ){
+			return false;
+		}
+
 
 		if ( parametersSize > 4 ){
 			strcpy ( message->address, 0 == strcmp(petitionParameters[3],"-a") ? "*" : petitionParameters[3] );
