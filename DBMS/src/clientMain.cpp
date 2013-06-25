@@ -23,6 +23,7 @@ int sendMessageRequest(struct messageRequest message );
 bool readMessageResponse(int clientId, list<struct messageResponse>* vMessagesResponses);
 void printMessageResponse(int requestAction,list<struct messageResponse>* vMessagesResponses);
 void releaseMessageQueuesResources();
+bool validateNotAsteriskPattern(char* data);
 
 bool GracefulQuitRequested;
 MessageQueue<messageRequest>* MQRequest = NULL;
@@ -73,32 +74,72 @@ bool packageMessageRequest(int clientId,int parametersSize, char* petitionParame
 	}else{
 		message->clientId = Convert::toInt(petitionParameters[1]) == GRACEFUL_QUIT ? 1 : clientId;
 		message->requestActionType = Convert::toInt(petitionParameters[1]);
-		strcpy ( message->name, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[2]);
 
-		if ( (parametersSize < 5)&&((message->requestActionType!=DELETE)&&(message->requestActionType!=GRACEFUL_QUIT))){
-			return false;
-		}
-		if ( (parametersSize < 6)&&(message->requestActionType==UPDATE) ){
-			return false;
-		}
-
-
-		if ( parametersSize > 4 ){
-			strcpy ( message->address, 0 == strcmp(petitionParameters[3],"-a") ? "*" : petitionParameters[3] );
-			strcpy ( message->telephone, 0 == strcmp(petitionParameters[4],"-a") ? "*" : petitionParameters[4] );
-		}else{
-			strcpy ( message->address, "*" );
-			strcpy ( message->telephone, "*" );
-		}
-
-		if ( parametersSize > 5 ){
-			strcpy ( message->nameId, petitionParameters[5] );
-		}else{
+		switch(message->requestActionType){
+		case READ:
+			if (parametersSize < 5){
+				return false;
+			}else{
+				strcpy ( message->name, 0 == strcmp(petitionParameters[2],"-a") ? "*" : petitionParameters[2]);
+				strcpy ( message->address, 0 == strcmp(petitionParameters[3],"-a") ? "*" : petitionParameters[3] );
+				strcpy ( message->telephone, 0 == strcmp(petitionParameters[4],"-a") ? "*" : petitionParameters[4] );
+				strcpy ( message->nameId, "" );
+			}
+			break;
+		case CREATE:
+			if (parametersSize < 5){
+				return false;
+			}else{
+				if ( (validateNotAsteriskPattern(petitionParameters[2])) && (validateNotAsteriskPattern(petitionParameters[3]))
+						&& (validateNotAsteriskPattern(petitionParameters[4])) ){
+					strcpy ( message->name, petitionParameters[2]);
+					strcpy ( message->address, petitionParameters[3] );
+					strcpy ( message->telephone, petitionParameters[4] );
+					strcpy ( message->nameId, "" );
+				}else{
+					return false;
+				}
+			}
+			break;
+		case UPDATE:
+			if (parametersSize < 6){
+				return false;
+			}else{
+				if ( (validateNotAsteriskPattern(petitionParameters[2])) && (validateNotAsteriskPattern(petitionParameters[3]))
+						&& (validateNotAsteriskPattern(petitionParameters[4])) && (validateNotAsteriskPattern(petitionParameters[5])) ){
+					strcpy ( message->name, petitionParameters[2]);
+					strcpy ( message->address, petitionParameters[3] );
+					strcpy ( message->telephone, petitionParameters[4] );
+					strcpy ( message->nameId, petitionParameters[5] );
+				}else{
+					return false;
+				}
+			}
+			break;
+		case DELETE:
+			if ( (validateNotAsteriskPattern(petitionParameters[2])) ){
+				strcpy ( message->name, petitionParameters[2]);
+				strcpy ( message->address, "" );
+				strcpy ( message->telephone, "" );
+				strcpy ( message->nameId, "" );
+			}else{
+				return false;
+			}
+			break;
+		case GRACEFUL_QUIT:
+			strcpy ( message->name, "");
+			strcpy ( message->address, "" );
+			strcpy ( message->telephone, "" );
 			strcpy ( message->nameId, "" );
+			break;
 		}
 
 		return true;
 	}
+}
+
+bool validateNotAsteriskPattern(char* data){
+	return (0 != strcmp(data,"-a"));
 }
 
 bool checkConnectionWithServer(){
