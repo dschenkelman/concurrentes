@@ -45,9 +45,6 @@ public class ClientUI extends JFrame{
 		JScrollPane scroll = new JScrollPane(container);
 		getContentPane().add(scroll);
 		
-		JLabel title = new JLabel("Client");
-		container.add(title);
-		
 		JLabel searchTitle = new JLabel("Search patterns:");
 		container.add(searchTitle);
 		
@@ -113,7 +110,6 @@ public class ClientUI extends JFrame{
 		
 		layout.setHorizontalGroup(
 				layout.createParallelGroup(GroupLayout.Alignment.LEADING)//GroupLayout.Alignment.LEADING
-					.addComponent(title)
 					.addComponent(searchTitle)
 					.addGroup(layout.createSequentialGroup()
 						.addComponent(patternTitleName)
@@ -136,7 +132,6 @@ public class ClientUI extends JFrame{
 		
 		layout.setVerticalGroup(
 				layout.createSequentialGroup()//GroupLayout.Alignment.LEADING
-					.addComponent(title)
 					.addComponent(searchTitle)
 					.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addComponent(patternTitleName)
@@ -180,7 +175,8 @@ public class ClientUI extends JFrame{
 						patternFieldAddress.getText();
 					String phonePattern = patternFieldPhone.getText().length() == 0 ? "-a" :
 						patternFieldPhone.getText();
-					String nameIdPattern = patternFieldNameId.getText();
+					String nameIdPattern = patternFieldNameId.getText().length() == 0 ? "-a" :
+						patternFieldNameId.getText();
 					
 					Process p = Runtime.getRuntime().exec(new String[] {
 							"./client", actionId + "",
